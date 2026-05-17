@@ -192,6 +192,51 @@ void main() {
       expect(resolved.color, Colors.blue);
     });
 
+    test('explicit variants replace defaults from the same type', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle<TestTokens, TextStyle>(
+        base: (_) => const TextStyle(),
+        merge: mergeTextStyle,
+        defaultVariants: const [ButtonTone.primary],
+        variants: {
+          ButtonTone.primary: (tokens) => TextStyle(color: tokens.primary),
+          ButtonTone.danger: (_) => const TextStyle(color: Colors.red),
+        },
+        compoundVariants: [
+          CompoundVariant(
+            when: const {ButtonTone.primary, ButtonTone.danger},
+            build: (_) => const TextStyle(decoration: TextDecoration.underline),
+          ),
+        ],
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.danger]);
+
+      expect(resolved.color, Colors.red);
+      expect(resolved.decoration, isNull);
+    });
+
+    test('button style variants override earlier button style values', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle<TestTokens, ButtonStyle>(
+        base: (_) => const ButtonStyle(),
+        merge: mergeButtonStyle,
+        defaultVariants: const [ButtonTone.primary],
+        variants: {
+          ButtonTone.primary: (tokens) => ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(tokens.primary),
+          ),
+          ButtonTone.danger: (_) => const ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(Colors.red),
+          ),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.danger]);
+
+      expect(resolved.backgroundColor?.resolve({}), Colors.red);
+    });
+
     test('applies compound variants when all required variants match', () {
       const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
       final style = VariantStyle<TestTokens, TextStyle>(
