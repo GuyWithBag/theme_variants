@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(tokens.name)),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,6 +84,81 @@ class HomePage extends StatelessWidget {
               onChanged: (value) {
                 if (value != null) controller.setDarkTheme(value);
               },
+            ),
+            const SizedBox(height: 24),
+            const FlashcardPreview(
+              title: 'Overridden flashcard',
+              subtitle: 'This card uses the forest theme boundary.',
+              useParentTheme: false,
+            ),
+            const SizedBox(height: 12),
+            const FlashcardPreview(
+              title: 'Inherited flashcard',
+              subtitle: 'This card uses the parent app theme.',
+              useParentTheme: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FlashcardPreview extends StatelessWidget {
+  const FlashcardPreview({
+    required this.title,
+    required this.subtitle,
+    required this.useParentTheme,
+    super.key,
+  });
+
+  final String title;
+  final String subtitle;
+  final bool useParentTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return ThemeVariantsOverride<AppTokens>(
+      enabled: !useParentTheme,
+      lightThemeId: 'forest',
+      darkThemeId: 'forest',
+      themeMode: ThemeMode.light,
+      child: _FlashcardSurface(title: title, subtitle: subtitle),
+    );
+  }
+}
+
+class _FlashcardSurface extends StatelessWidget {
+  const _FlashcardSurface({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.themeTokens<AppTokens>();
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tokens.primary.withValues(alpha: 0.08),
+        border: Border.all(color: tokens.primary, width: tokens.borderWidth),
+        borderRadius: BorderRadius.circular(tokens.radius),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(tokens.spaceLg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(subtitle),
+            const SizedBox(height: 12),
+            Text('Card tokens: ${tokens.name}'),
+            const SizedBox(height: 12),
+            FilledButton(
+              style: buttonStyle.resolve(tokens),
+              onPressed: () {},
+              child: const Text('Default action'),
             ),
           ],
         ),

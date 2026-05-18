@@ -13,6 +13,10 @@ void main() {
     expect(find.text('Primary large'), findsOneWidget);
     expect(find.text('Danger small'), findsOneWidget);
     expect(find.text('Danger large compound'), findsOneWidget);
+    expect(find.text('Overridden flashcard'), findsOneWidget);
+    expect(find.text('Inherited flashcard'), findsOneWidget);
+    expect(find.text('Card tokens: Forest Light'), findsOneWidget);
+    expect(find.text('Card tokens: Clean Light'), findsOneWidget);
   });
 
   testWidgets('can force the dark theme independently', (tester) async {
