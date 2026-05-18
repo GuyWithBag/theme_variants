@@ -3,7 +3,7 @@ import 'package:theme_variants/theme_variants.dart';
 
 import '../tokens/app_tokens.dart';
 
-const cleanLightTokens = (
+const AppTokens cleanLightTokens = (
   name: 'Clean Light',
   primary: Colors.blue,
   onPrimary: Colors.white,
@@ -16,7 +16,7 @@ const cleanLightTokens = (
   spaceLg: 18.0,
 );
 
-const cleanDarkTokens = (
+const AppTokens cleanDarkTokens = (
   name: 'Clean Dark',
   primary: Colors.indigo,
   onPrimary: Colors.white,
@@ -29,7 +29,7 @@ const cleanDarkTokens = (
   spaceLg: 18.0,
 );
 
-const forestLightTokens = (
+const AppTokens forestLightTokens = (
   name: 'Forest Light',
   primary: Colors.green,
   onPrimary: Colors.white,
@@ -42,7 +42,7 @@ const forestLightTokens = (
   spaceLg: 22.0,
 );
 
-const forestDarkTokens = (
+const AppTokens forestDarkTokens = (
   name: 'Forest Dark',
   primary: Colors.teal,
   onPrimary: Colors.black,
@@ -55,7 +55,7 @@ const forestDarkTokens = (
   spaceLg: 22.0,
 );
 
-const monoTokens = (
+const AppTokens monoTokens = (
   name: 'Mono',
   primary: Colors.black,
   onPrimary: Colors.white,
