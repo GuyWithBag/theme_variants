@@ -9,8 +9,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ThemeVariantsProvider.controllerOf<AppTokens>(context);
-    final tokens = ThemeVariantsProvider.tokensOf<AppTokens>(context);
+    final controller = context.themeVariantsController<AppTokens>();
+    final tokens = context.themeTokens<AppTokens>();
 
     return Scaffold(
       appBar: AppBar(title: Text(tokens.name)),
@@ -20,6 +20,9 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Active tokens: ${tokens.name}'),
+            Text(
+              'radius ${tokens.radius.toStringAsFixed(0)} / spacing ${tokens.spaceSm.toStringAsFixed(0)}-${tokens.spaceLg.toStringAsFixed(0)}',
+            ),
             const SizedBox(height: 16),
             FilledButton(
               style: buttonStyle.resolve(tokens, const [
@@ -37,6 +40,15 @@ class HomePage extends StatelessWidget {
               ]),
               onPressed: () {},
               child: const Text('Danger small'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              style: buttonStyle.resolve(tokens, const [
+                ButtonSize.lg,
+                ButtonTone.danger,
+              ]),
+              onPressed: () {},
+              child: const Text('Danger large compound'),
             ),
             const SizedBox(height: 24),
             SegmentedButton<ThemeMode>(

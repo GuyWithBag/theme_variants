@@ -12,6 +12,7 @@ void main() {
     expect(find.text('Active tokens: Clean Light'), findsOneWidget);
     expect(find.text('Primary large'), findsOneWidget);
     expect(find.text('Danger small'), findsOneWidget);
+    expect(find.text('Danger large compound'), findsOneWidget);
   });
 
   testWidgets('can force the dark theme independently', (tester) async {
