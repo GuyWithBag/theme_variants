@@ -9,6 +9,8 @@ class ThemeVariantRegistry<TTokens> {
 
   final Map<String, ThemeVariantEntry<TTokens>> themes;
 
+  Iterable<String> get ids => themes.keys;
+
   bool contains(String id) => themes.containsKey(id);
 
   ThemeVariant<TTokens> resolve({
@@ -17,7 +19,12 @@ class ThemeVariantRegistry<TTokens> {
   }) {
     final entry = themes[id];
     if (entry == null) {
-      throw ArgumentError.value(id, 'id', 'No theme variant is registered.');
+      final available = ids.isEmpty ? 'none' : ids.join(', ');
+      throw ArgumentError.value(
+        id,
+        'id',
+        'No theme variant is registered. Available ids: $available.',
+      );
     }
 
     return entry.resolve(brightness);

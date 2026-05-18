@@ -11,70 +11,66 @@ enum ButtonTone { primary, danger }
 ///
 /// In Tailwind/CVA terms, [ButtonSize] and [ButtonTone] are variant options.
 /// Calling [resolve] returns a Flutter [ButtonStyle] instead of a class string.
-final buttonStyle = VariantStyle.button<AppTokens>(
-  base: (tokens) => ButtonStyle(
-    side: WidgetStatePropertyAll(
+final buttonStyle = VariantStyle.buttonParts<AppTokens>(
+  base: (tokens) => {
+    ButtonStylePart.side(
       BorderSide(color: tokens.primary, width: tokens.borderWidth),
     ),
-    shape: WidgetStatePropertyAll(
+    ButtonStylePart.shape(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(tokens.radius),
       ),
     ),
-  ),
+  },
   defaultVariants: const [ButtonSize.md, ButtonTone.primary],
   variants: {
-    ButtonSize.sm: (tokens) => ButtonStyle(
-      padding: WidgetStatePropertyAll(
+    ButtonSize.sm: (tokens) => {
+      ButtonStylePart.padding(
         EdgeInsets.symmetric(
           horizontal: tokens.spaceMd,
           vertical: tokens.spaceSm,
         ),
       ),
-    ),
-    ButtonSize.md: (tokens) => ButtonStyle(
-      padding: WidgetStatePropertyAll(
+    },
+    ButtonSize.md: (tokens) => {
+      ButtonStylePart.padding(
         EdgeInsets.symmetric(
           horizontal: tokens.spaceLg,
           vertical: tokens.spaceMd,
         ),
       ),
-    ),
-    ButtonSize.lg: (tokens) => ButtonStyle(
-      padding: WidgetStatePropertyAll(
+    },
+    ButtonSize.lg: (tokens) => {
+      ButtonStylePart.padding(
         EdgeInsets.symmetric(
           horizontal: tokens.spaceLg * 1.35,
           vertical: tokens.spaceMd * 1.25,
         ),
       ),
-    ),
-    ButtonTone.primary: (tokens) => ButtonStyle(
-      backgroundColor: WidgetStatePropertyAll(tokens.primary),
-      foregroundColor: WidgetStatePropertyAll(tokens.onPrimary),
-      side: WidgetStatePropertyAll(
+    },
+    ButtonTone.primary: (tokens) => {
+      ButtonStylePart.backgroundColor(tokens.primary),
+      ButtonStylePart.foregroundColor(tokens.onPrimary),
+      ButtonStylePart.side(
         BorderSide(color: tokens.primary, width: tokens.borderWidth),
       ),
-    ),
-    ButtonTone.danger: (tokens) => ButtonStyle(
-      backgroundColor: WidgetStatePropertyAll(tokens.danger),
-      foregroundColor: WidgetStatePropertyAll(tokens.onDanger),
-      side: WidgetStatePropertyAll(
+    },
+    ButtonTone.danger: (tokens) => {
+      ButtonStylePart.backgroundColor(tokens.danger),
+      ButtonStylePart.foregroundColor(tokens.onDanger),
+      ButtonStylePart.side(
         BorderSide(color: tokens.danger, width: tokens.borderWidth),
       ),
-    ),
+    },
   },
   compoundVariants: [
-    CompoundVariant(
+    CompoundVariantParts(
       when: const {ButtonSize.lg, ButtonTone.danger},
-      build: (tokens) => ButtonStyle(
-        elevation: const WidgetStatePropertyAll(6),
-        shadowColor: WidgetStatePropertyAll(
-          tokens.danger.withValues(alpha: 0.4),
-        ),
-        textStyle: const WidgetStatePropertyAll(
-          TextStyle(fontWeight: FontWeight.w700),
-        ),
-      ),
+      build: (tokens) => {
+        ButtonStylePart.elevation(6),
+        ButtonStylePart.shadowColor(tokens.danger.withValues(alpha: 0.4)),
+        ButtonStylePart.textStyle(const TextStyle(fontWeight: FontWeight.w700)),
+      },
     ),
   ],
 );

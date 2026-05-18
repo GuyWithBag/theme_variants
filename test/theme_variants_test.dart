@@ -8,6 +8,8 @@ enum ButtonTone { primary, danger }
 
 enum CardTone { neutral, highlighted }
 
+enum ButtonDensity { compact }
+
 class TestTokens {
   const TestTokens({
     required this.name,
@@ -80,6 +82,40 @@ void main() {
       expect(
         registry.resolve(id: 'brand', brightness: Brightness.dark).tokens.name,
         'brand dark',
+      );
+    });
+
+    test('exposes registered ids', () {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'mono': SingleThemeVariant(theme('mono', Brightness.light, 'mono')),
+        },
+      );
+
+      expect(registry.ids, containsAll(['clean', 'mono']));
+    });
+
+    test('unknown id errors include available ids', () {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+        },
+      );
+
+      expect(
+        () => registry.resolve(id: 'missing', brightness: Brightness.light),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            contains('Available ids: clean'),
+          ),
+        ),
       );
     });
   });
@@ -409,6 +445,96 @@ void main() {
 
       expect(find.text('card transformed'), findsOneWidget);
     });
+
+    testWidgets('override follows parent theme changes when ids are omitted', (
+      tester,
+    ) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'forest': SingleThemeVariant(
+            theme('forest', Brightness.light, 'forest'),
+          ),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+        themeMode: ThemeMode.light,
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: ThemeVariantsOverride<TestTokens>(
+            child: Builder(
+              builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(tokens.name),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('clean'), findsOneWidget);
+
+      controller.setLightTheme('forest');
+      await tester.pump();
+
+      expect(find.text('forest'), findsOneWidget);
+    });
+
+    testWidgets('override updates when enabled toggles', (tester) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+
+      Widget build({required bool enabled}) {
+        return ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: ThemeVariantsOverride<TestTokens>(
+            enabled: enabled,
+            lightThemeId: 'card',
+            darkThemeId: 'card',
+            child: Builder(
+              builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(tokens.name),
+                );
+              },
+            ),
+          ),
+        );
+      }
+
+      await tester.pumpWidget(build(enabled: true));
+      expect(find.text('card'), findsOneWidget);
+
+      await tester.pumpWidget(build(enabled: false));
+      expect(find.text('clean'), findsOneWidget);
+
+      await tester.pumpWidget(build(enabled: true));
+      expect(find.text('card'), findsOneWidget);
+    });
   });
 
   group('VariantStyle', () {
@@ -456,6 +582,83 @@ void main() {
       expect(resolved.color, Colors.red);
       expect(resolved.decoration, isNull);
     });
+
+    test('throws when a selected variant is not registered', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.text<TestTokens>(
+        base: (_) => const TextStyle(),
+        variants: {ButtonSize.md: (_) => const TextStyle(fontSize: 14)},
+      );
+
+      expect(
+        () => style.resolve(tokens, const [ButtonSize.lg]),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws when a default variant is not registered', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.text<TestTokens>(
+        base: (_) => const TextStyle(),
+        defaultVariants: const [ButtonSize.md],
+        variants: {ButtonSize.lg: (_) => const TextStyle(fontSize: 18)},
+      );
+
+      expect(() => style.resolve(tokens), throwsA(isA<StateError>()));
+    });
+
+    test('throws when defaults contain duplicate variant types', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.text<TestTokens>(
+        base: (_) => const TextStyle(),
+        defaultVariants: const [ButtonSize.sm, ButtonSize.md],
+        variants: {
+          ButtonSize.sm: (_) => const TextStyle(fontSize: 12),
+          ButtonSize.md: (_) => const TextStyle(fontSize: 14),
+        },
+      );
+
+      expect(() => style.resolve(tokens), throwsA(isA<StateError>()));
+    });
+
+    test('throws when selected variants contain duplicate variant types', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.text<TestTokens>(
+        base: (_) => const TextStyle(),
+        variants: {
+          ButtonSize.sm: (_) => const TextStyle(fontSize: 12),
+          ButtonSize.md: (_) => const TextStyle(fontSize: 14),
+        },
+      );
+
+      expect(
+        () => style.resolve(tokens, const [ButtonSize.sm, ButtonSize.md]),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test(
+      'throws when a compound variant references an unregistered variant',
+      () {
+        const tokens = TestTokens(
+          name: 'test',
+          radius: 12,
+          primary: Colors.blue,
+        );
+        final style = VariantStyle.text<TestTokens>(
+          base: (_) => const TextStyle(),
+          variants: {ButtonSize.lg: (_) => const TextStyle(fontSize: 18)},
+          compoundVariants: [
+            CompoundVariant(
+              when: const {ButtonSize.lg, ButtonTone.danger},
+              build: (_) => const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ],
+        );
+
+        expect(() => style.resolve(tokens), throwsA(isA<StateError>()));
+      },
+    );
 
     test('button style variants override earlier button style values', () {
       const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
@@ -653,6 +856,181 @@ void main() {
           CompoundVariant(
             when: const {ButtonSize.lg, ButtonTone.danger},
             build: (_) => const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ],
+      );
+
+      final resolved = style.resolve(tokens, const [
+        ButtonSize.lg,
+        ButtonTone.danger,
+      ]);
+
+      expect(resolved.fontSize, 18);
+      expect(resolved.color, Colors.red);
+      expect(resolved.fontWeight, FontWeight.w700);
+    });
+
+    test('decoration parts resolve set-like style fragments', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.decorationParts<TestTokens>(
+        base: (tokens) => {
+          DecorationPart.radius(tokens.radius),
+          DecorationPart.color(Colors.white),
+        },
+        defaultVariants: const [CardTone.neutral],
+        variants: {
+          CardTone.neutral: (_) => const <StylePart<BoxDecoration>>{},
+          CardTone.highlighted: (tokens) => {
+            DecorationPart.color(tokens.primary),
+            DecorationPart.border(Border.all(color: tokens.primary)),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.color, Colors.blue);
+      expect(resolved.borderRadius, BorderRadius.circular(12));
+      expect(resolved.border, Border.all(color: Colors.blue));
+    });
+
+    test('button parts resolve ButtonStyle fragments', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.buttonParts<TestTokens>(
+        base: (tokens) => {
+          ButtonStylePart.shape(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(tokens.radius),
+            ),
+          ),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            ButtonStylePart.backgroundColor(tokens.primary),
+            ButtonStylePart.foregroundColor(Colors.white),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.backgroundColor?.resolve({}), Colors.blue);
+      expect(resolved.foregroundColor?.resolve({}), Colors.white);
+    });
+
+    test('parts constructors resolve supported Flutter style types', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+
+      final text = VariantStyle.textParts<TestTokens>(
+        base: (_) => {
+          TextStylePart.fontSize(14),
+          TextStylePart.color(Colors.black),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {TextStylePart.color(tokens.primary)},
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(text.color, Colors.blue);
+      expect(text.fontSize, 14);
+
+      final textTheme = VariantStyle.textThemeParts<TestTokens>(
+        base: (_) => {TextThemePart.titleMedium(const TextStyle(fontSize: 18))},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            TextThemePart.titleMedium(TextStyle(color: tokens.primary)),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(textTheme.titleMedium?.color, Colors.blue);
+
+      final icon = VariantStyle.iconParts<TestTokens>(
+        base: (_) => {IconThemePart.size(20)},
+        variants: {
+          ButtonTone.primary: (tokens) => {IconThemePart.color(tokens.primary)},
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(icon.color, Colors.blue);
+      expect(icon.size, 20);
+
+      final inputDecoration = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => {
+          InputDecorationPart.contentPadding(const EdgeInsets.all(12)),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            InputDecorationPart.fillColor(tokens.primary),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(inputDecoration.contentPadding, const EdgeInsets.all(12));
+      expect(inputDecoration.fillColor, Colors.blue);
+
+      final listTile = VariantStyle.listTileParts<TestTokens>(
+        base: (_) => {ListTilePart.contentPadding(const EdgeInsets.all(12))},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            ListTilePart.tileColor(tokens.primary),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(listTile.contentPadding, const EdgeInsets.all(12));
+      expect(listTile.tileColor, Colors.blue);
+
+      final card = VariantStyle.cardParts<TestTokens>(
+        base: (_) => {CardPart.margin(const EdgeInsets.all(12))},
+        variants: {
+          ButtonTone.primary: (tokens) => {CardPart.color(tokens.primary)},
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(card.margin, const EdgeInsets.all(12));
+      expect(card.color, Colors.blue);
+
+      final chip = VariantStyle.chipParts<TestTokens>(
+        base: (_) => {ChipPart.padding(const EdgeInsets.all(12))},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            ChipPart.backgroundColor(tokens.primary),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(chip.padding, const EdgeInsets.all(12));
+      expect(chip.backgroundColor, Colors.blue);
+
+      final navigationBar = VariantStyle.navigationBarParts<TestTokens>(
+        base: (_) => {NavigationBarPart.height(72)},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            NavigationBarPart.backgroundColor(tokens.primary),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(navigationBar.height, 72);
+      expect(navigationBar.backgroundColor, Colors.blue);
+
+      final tabBar = VariantStyle.tabBarParts<TestTokens>(
+        base: (_) => {TabBarPart.labelPadding(const EdgeInsets.all(12))},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            TabBarPart.labelColor(tokens.primary),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(tabBar.labelPadding, const EdgeInsets.all(12));
+      expect(tabBar.labelColor, Colors.blue);
+    });
+
+    test('parts compound variants use set-like style fragments', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.textParts<TestTokens>(
+        base: (_) => {TextStylePart.fontSize(14)},
+        variants: {
+          ButtonSize.lg: (_) => {TextStylePart.fontSize(18)},
+          ButtonTone.danger: (_) => {TextStylePart.color(Colors.red)},
+        },
+        compoundVariants: [
+          CompoundVariantParts(
+            when: const {ButtonSize.lg, ButtonTone.danger},
+            build: (_) => {TextStylePart.fontWeight(FontWeight.w700)},
           ),
         ],
       );

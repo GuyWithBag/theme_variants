@@ -267,6 +267,24 @@ VariantStyle.tabBar<AppTokens>(...)
 VariantStyle.decoration<AppTokens>(...)
 ```
 
+Each shortcut also has a `...Parts` form when you want to compose styles from
+small typed fragments instead of constructing the full Flutter style object in
+every variant:
+
+```dart
+VariantStyle.buttonParts<AppTokens>(...)
+VariantStyle.textParts<AppTokens>(...)
+VariantStyle.textThemeParts<AppTokens>(...)
+VariantStyle.iconParts<AppTokens>(...)
+VariantStyle.inputDecorationParts<AppTokens>(...)
+VariantStyle.listTileParts<AppTokens>(...)
+VariantStyle.cardParts<AppTokens>(...)
+VariantStyle.chipParts<AppTokens>(...)
+VariantStyle.navigationBarParts<AppTokens>(...)
+VariantStyle.tabBarParts<AppTokens>(...)
+VariantStyle.decorationParts<AppTokens>(...)
+```
+
 ```dart
 enum ButtonSize { sm, md, lg }
 enum ButtonTone { primary, danger }
@@ -318,6 +336,24 @@ FilledButton(
 
 Explicit variants replace defaults from the same enum/type group. For example, `ButtonTone.danger` replaces the default `ButtonTone.primary`.
 
+`resolve` is strict. Every default, selected, and compound variant must be
+registered in `variants`. Passing an unknown variant throws an error instead of
+being ignored.
+
+Use one enum per visual axis:
+
+```dart
+enum ButtonSize { sm, md, lg }
+enum ButtonTone { primary, danger }
+```
+
+Do not pass two variants from the same enum/type group in one resolve call:
+
+```dart
+// Throws: both values are ButtonSize variants.
+buttonStyle.resolve(tokens, const [ButtonSize.sm, ButtonSize.lg]);
+```
+
 For card surfaces and panels, use `VariantStyle.decoration`:
 
 ```dart
@@ -334,6 +370,23 @@ final cardDecoration = VariantStyle.decoration<AppTokens>(
 );
 ```
 
+Or use `VariantStyle.decorationParts` to avoid repeating `BoxDecoration`:
+
+```dart
+final cardDecoration = VariantStyle.decorationParts<AppTokens>(
+  base: (tokens) => {
+    DecorationPart.radius(tokens.radius),
+    DecorationPart.color(Colors.white),
+  },
+  variants: {
+    CardTone.highlighted: (tokens) => {
+      DecorationPart.color(tokens.primary.withValues(alpha: 0.08)),
+      DecorationPart.border(Border.all(color: tokens.primary)),
+    },
+  },
+);
+```
+
 ## Compound Variants
 
 Use `CompoundVariant` when a style should apply only when multiple variants are selected.
@@ -343,6 +396,19 @@ compoundVariants: [
   CompoundVariant<AppTokens, TextStyle>(
     when: const {ButtonSize.lg, ButtonTone.danger},
     build: (_) => const TextStyle(fontWeight: FontWeight.w700),
+  ),
+],
+```
+
+When using a `...Parts` constructor, use `CompoundVariantParts`:
+
+```dart
+compoundVariants: [
+  CompoundVariantParts<AppTokens, TextStyle>(
+    when: const {ButtonSize.lg, ButtonTone.danger},
+    build: (_) => {
+      TextStylePart.fontWeight(FontWeight.w700),
+    },
   ),
 ],
 ```
