@@ -6,6 +6,8 @@ enum ButtonSize { sm, md, lg }
 
 enum ButtonTone { primary, danger }
 
+enum CardTone { neutral, highlighted }
+
 class TestTokens {
   const TestTokens({
     required this.name,
@@ -132,6 +134,40 @@ void main() {
         'clean light',
       );
     });
+
+    test('applies theme transforms to resolved themes', () {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+        transform: (theme) {
+          return ThemeVariant<TestTokens>(
+            id: theme.id,
+            themeData: theme.themeData.copyWith(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
+            ),
+            tokens: TestTokens(
+              name: '${theme.tokens.name} customized',
+              radius: 24,
+              primary: Colors.purple,
+            ),
+          );
+        },
+      );
+
+      final resolved = controller.lightTheme();
+
+      expect(resolved.tokens.name, 'clean customized');
+      expect(resolved.tokens.radius, 24);
+      expect(resolved.tokens.primary, Colors.purple);
+    });
   });
 
   group('ThemeVariantsProvider', () {
@@ -201,6 +237,177 @@ void main() {
       );
 
       expect(find.text('clean'), findsOneWidget);
+    });
+
+    testWidgets('override can provide a separate subtree theme', (
+      tester,
+    ) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: ThemeVariantsOverride<TestTokens>(
+            lightThemeId: 'card',
+            darkThemeId: 'card',
+            child: Builder(
+              builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(tokens.name),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('card'), findsOneWidget);
+    });
+
+    testWidgets('disabled override inherits the parent theme', (tester) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: ThemeVariantsOverride<TestTokens>(
+            enabled: false,
+            lightThemeId: 'card',
+            darkThemeId: 'card',
+            child: Builder(
+              builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(tokens.name),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('clean'), findsOneWidget);
+    });
+
+    testWidgets('override can fix its own brightness mode', (tester) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': LightDarkThemeVariant(
+            light: theme('clean-light', Brightness.light, 'clean light'),
+            dark: theme('clean-dark', Brightness.dark, 'clean dark'),
+          ),
+          'card': LightDarkThemeVariant(
+            light: theme('card-light', Brightness.light, 'card light'),
+            dark: theme('card-dark', Brightness.dark, 'card dark'),
+          ),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+        themeMode: ThemeMode.dark,
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: MediaQuery(
+            data: const MediaQueryData(platformBrightness: Brightness.dark),
+            child: ThemeVariantsOverride<TestTokens>(
+              lightThemeId: 'card',
+              darkThemeId: 'card',
+              themeMode: ThemeMode.light,
+              child: Builder(
+                builder: (context) {
+                  final tokens = context.themeTokens<TestTokens>();
+                  return Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Text(tokens.name),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('card light'), findsOneWidget);
+    });
+
+    testWidgets('override inherits the parent theme transform', (tester) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+        transform: (theme) {
+          return ThemeVariant<TestTokens>(
+            id: theme.id,
+            themeData: theme.themeData,
+            tokens: TestTokens(
+              name: '${theme.tokens.name} transformed',
+              radius: theme.tokens.radius,
+              primary: theme.tokens.primary,
+            ),
+          );
+        },
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: ThemeVariantsOverride<TestTokens>(
+            lightThemeId: 'card',
+            darkThemeId: 'card',
+            child: Builder(
+              builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(tokens.name),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('card transformed'), findsOneWidget);
     });
   });
 
@@ -284,6 +491,153 @@ void main() {
 
       expect(resolved.fontSize, 14);
       expect(resolved.color, Colors.blue);
+    });
+
+    test('text theme constructor uses the text theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.textTheme<TestTokens>(
+        base: (_) => const TextTheme(titleMedium: TextStyle(fontSize: 18)),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              TextTheme(titleMedium: TextStyle(color: tokens.primary)),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.titleMedium?.fontSize, 18);
+      expect(resolved.titleMedium?.color, Colors.blue);
+    });
+
+    test('icon constructor uses the icon theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.icon<TestTokens>(
+        base: (_) => const IconThemeData(size: 20),
+        variants: {
+          ButtonTone.primary: (tokens) => IconThemeData(color: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.size, 20);
+      expect(resolved.color, Colors.blue);
+    });
+
+    test('decoration constructor uses the box decoration merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.decoration<TestTokens>(
+        base: (tokens) =>
+            BoxDecoration(borderRadius: BorderRadius.circular(tokens.radius)),
+        defaultVariants: const [CardTone.neutral],
+        variants: {
+          CardTone.neutral: (_) => const BoxDecoration(color: Colors.white),
+          CardTone.highlighted: (tokens) =>
+              BoxDecoration(color: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.color, Colors.blue);
+      expect(resolved.borderRadius, BorderRadius.circular(12));
+    });
+
+    test('input decoration constructor uses the input theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.inputDecoration<TestTokens>(
+        base: (_) =>
+            const InputDecorationThemeData(contentPadding: EdgeInsets.all(12)),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              InputDecorationThemeData(fillColor: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.contentPadding, const EdgeInsets.all(12));
+      expect(resolved.fillColor, Colors.blue);
+    });
+
+    test('list tile constructor uses the list tile theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.listTile<TestTokens>(
+        base: (_) =>
+            const ListTileThemeData(contentPadding: EdgeInsets.all(12)),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              ListTileThemeData(tileColor: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.contentPadding, const EdgeInsets.all(12));
+      expect(resolved.tileColor, Colors.blue);
+    });
+
+    test('card constructor uses the card theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.card<TestTokens>(
+        base: (_) => const CardThemeData(margin: EdgeInsets.all(12)),
+        variants: {
+          ButtonTone.primary: (tokens) => CardThemeData(color: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.margin, const EdgeInsets.all(12));
+      expect(resolved.color, Colors.blue);
+    });
+
+    test('chip constructor uses the chip theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.chip<TestTokens>(
+        base: (_) => const ChipThemeData(padding: EdgeInsets.all(12)),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              ChipThemeData(backgroundColor: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.padding, const EdgeInsets.all(12));
+      expect(resolved.backgroundColor, Colors.blue);
+    });
+
+    test('navigation bar constructor uses the navigation theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.navigationBar<TestTokens>(
+        base: (_) => const NavigationBarThemeData(height: 72),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              NavigationBarThemeData(backgroundColor: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.height, 72);
+      expect(resolved.backgroundColor, Colors.blue);
+    });
+
+    test('tab bar constructor uses the tab bar theme merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.tabBar<TestTokens>(
+        base: (_) => const TabBarThemeData(labelPadding: EdgeInsets.all(12)),
+        variants: {
+          ButtonTone.primary: (tokens) =>
+              TabBarThemeData(labelColor: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.labelPadding, const EdgeInsets.all(12));
+      expect(resolved.labelColor, Colors.blue);
     });
 
     test('applies compound variants when all required variants match', () {

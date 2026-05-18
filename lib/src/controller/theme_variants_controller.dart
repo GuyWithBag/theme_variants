@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../theme/theme_variant.dart';
 import '../theme/theme_variant_registry.dart';
 
+/// Transforms a resolved theme before it is returned by the controller.
+typedef ThemeVariantTransformer<TTokens> =
+    ThemeVariant<TTokens> Function(ThemeVariant<TTokens> theme);
+
 /// Controls the selected light and dark themes independently.
 class ThemeVariantsController<TTokens> extends ChangeNotifier {
   ThemeVariantsController({
@@ -10,10 +14,12 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     required String lightThemeId,
     required String darkThemeId,
     ThemeMode themeMode = ThemeMode.system,
+    ThemeVariantTransformer<TTokens>? transform,
   }) : _registry = registry,
        _lightThemeId = lightThemeId,
        _darkThemeId = darkThemeId,
-       _themeMode = themeMode {
+       _themeMode = themeMode,
+       _transform = transform {
     _assertRegistered(lightThemeId);
     _assertRegistered(darkThemeId);
   }
@@ -22,6 +28,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
   String _lightThemeId;
   String _darkThemeId;
   ThemeMode _themeMode;
+  ThemeVariantTransformer<TTokens>? _transform;
 
   ThemeVariantRegistry<TTokens> get registry => _registry;
 
@@ -30,6 +37,8 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
   String get darkThemeId => _darkThemeId;
 
   ThemeMode get themeMode => _themeMode;
+
+  ThemeVariantTransformer<TTokens>? get transform => _transform;
 
   set registry(ThemeVariantRegistry<TTokens> value) {
     if (identical(value, _registry)) return;
@@ -63,12 +72,23 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setTransform(ThemeVariantTransformer<TTokens>? transform) {
+    if (identical(transform, _transform)) return;
+
+    _transform = transform;
+    notifyListeners();
+  }
+
   ThemeVariant<TTokens> lightTheme() {
-    return _registry.resolve(id: _lightThemeId, brightness: Brightness.light);
+    return _applyTransform(
+      _registry.resolve(id: _lightThemeId, brightness: Brightness.light),
+    );
   }
 
   ThemeVariant<TTokens> darkTheme() {
-    return _registry.resolve(id: _darkThemeId, brightness: Brightness.dark);
+    return _applyTransform(
+      _registry.resolve(id: _darkThemeId, brightness: Brightness.dark),
+    );
   }
 
   ThemeVariant<TTokens> activeTheme(Brightness platformBrightness) {
@@ -79,6 +99,11 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     };
 
     return brightness == Brightness.dark ? darkTheme() : lightTheme();
+  }
+
+  ThemeVariant<TTokens> _applyTransform(ThemeVariant<TTokens> theme) {
+    final transform = _transform;
+    return transform == null ? theme : transform(theme);
   }
 
   void _assertRegistered(String id) {

@@ -6,4 +6,5 @@ export 'src/variants/compound_variant.dart';
 export 'src/variants/mergers.dart';
 export 'src/variants/variant_style.dart';
 export 'src/widgets/theme_variants_context.dart';
+export 'src/widgets/theme_variants_override.dart';
 export 'src/widgets/theme_variants_provider.dart';
