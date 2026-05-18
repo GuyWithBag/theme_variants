@@ -168,6 +168,40 @@ void main() {
 
       expect(find.text('clean'), findsOneWidget);
     });
+
+    testWidgets('exposes active tokens through context extension', (
+      tester,
+    ) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        themes: {
+          'clean': SingleThemeVariant(
+            theme('clean', Brightness.light, 'clean'),
+          ),
+        },
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: Builder(
+            builder: (context) {
+              final tokens = context.themeTokens<TestTokens>();
+              return Directionality(
+                textDirection: TextDirection.ltr,
+                child: Text(tokens.name),
+              );
+            },
+          ),
+        ),
+      );
+
+      expect(find.text('clean'), findsOneWidget);
+    });
   });
 
   group('VariantStyle', () {
@@ -218,9 +252,8 @@ void main() {
 
     test('button style variants override earlier button style values', () {
       const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
-      final style = VariantStyle<TestTokens, ButtonStyle>(
+      final style = VariantStyle.button<TestTokens>(
         base: (_) => const ButtonStyle(),
-        merge: mergeButtonStyle,
         defaultVariants: const [ButtonTone.primary],
         variants: {
           ButtonTone.primary: (tokens) => ButtonStyle(
@@ -235,6 +268,22 @@ void main() {
       final resolved = style.resolve(tokens, const [ButtonTone.danger]);
 
       expect(resolved.backgroundColor?.resolve({}), Colors.red);
+    });
+
+    test('text style constructor uses the text style merger', () {
+      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      final style = VariantStyle.text<TestTokens>(
+        base: (_) => const TextStyle(fontSize: 14),
+        defaultVariants: const [ButtonTone.primary],
+        variants: {
+          ButtonTone.primary: (tokens) => TextStyle(color: tokens.primary),
+        },
+      );
+
+      final resolved = style.resolve(tokens);
+
+      expect(resolved.fontSize, 14);
+      expect(resolved.color, Colors.blue);
     });
 
     test('applies compound variants when all required variants match', () {
