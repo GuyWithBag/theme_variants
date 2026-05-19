@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme_variant.dart';
+import '../theme/theme_variant_entry.dart';
 import '../theme/theme_variant_registry.dart';
 
 /// Transforms a resolved theme before it is returned by the controller.
@@ -85,11 +86,15 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     );
   }
 
+  ThemeVariant<TTokens> getCurrentLightTheme() => lightTheme();
+
   ThemeVariant<TTokens> darkTheme() {
     return _applyTransform(
       _registry.resolve(id: _darkThemeId, brightness: Brightness.dark),
     );
   }
+
+  ThemeVariant<TTokens> getCurrentDarkTheme() => darkTheme();
 
   ThemeVariant<TTokens> activeTheme(Brightness platformBrightness) {
     final brightness = switch (_themeMode) {
@@ -101,6 +106,38 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     return brightness == Brightness.dark ? darkTheme() : lightTheme();
   }
 
+  ThemeVariant<TTokens> getCurrentTheme(Brightness platformBrightness) {
+    return activeTheme(platformBrightness);
+  }
+
+  ThemePreset<TTokens> lightThemePreset() {
+    return _registry.preset(_lightThemeId);
+  }
+
+  ThemePreset<TTokens> getCurrentLightThemePreset() => lightThemePreset();
+
+  ThemePreset<TTokens> darkThemePreset() {
+    return _registry.preset(_darkThemeId);
+  }
+
+  ThemePreset<TTokens> getCurrentDarkThemePreset() => darkThemePreset();
+
+  ThemePreset<TTokens> activeThemePreset(Brightness platformBrightness) {
+    final brightness = switch (_themeMode) {
+      ThemeMode.light => Brightness.light,
+      ThemeMode.dark => Brightness.dark,
+      ThemeMode.system => platformBrightness,
+    };
+
+    return brightness == Brightness.dark
+        ? darkThemePreset()
+        : lightThemePreset();
+  }
+
+  ThemePreset<TTokens> getCurrentThemePreset(Brightness platformBrightness) {
+    return activeThemePreset(platformBrightness);
+  }
+
   ThemeVariant<TTokens> _applyTransform(ThemeVariant<TTokens> theme) {
     final transform = _transform;
     return transform == null ? theme : transform(theme);
@@ -108,7 +145,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
 
   void _assertRegistered(String id) {
     if (!_registry.contains(id)) {
-      throw ArgumentError.value(id, 'id', 'No theme variant is registered.');
+      throw ArgumentError.value(id, 'id', 'No theme preset is registered.');
     }
   }
 }

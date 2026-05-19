@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../controller/theme_variants_controller.dart';
 import '../theme/theme_variant.dart';
+import '../theme/theme_variant_entry.dart';
 
 /// Exposes a [ThemeVariantsController] to the widget tree.
 class ThemeVariantsProvider<TTokens>
@@ -47,6 +48,15 @@ class ThemeVariantsProvider<TTokens>
     final controller = controllerOf<TTokens>(context, listen: listen);
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
     return controller.activeTheme(platformBrightness);
+  }
+
+  static ThemePreset<TTokens> activeThemePresetOf<TTokens>(
+    BuildContext context, {
+    bool listen = true,
+  }) {
+    final controller = controllerOf<TTokens>(context, listen: listen);
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
+    return controller.activeThemePreset(platformBrightness);
   }
 
   static TTokens tokensOf<TTokens>(BuildContext context, {bool listen = true}) {

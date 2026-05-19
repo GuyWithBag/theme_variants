@@ -64,11 +64,13 @@ const AppTokens monoTokens = (
 );
 
 final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
-  themes: {
-    'clean': LightDarkThemeVariant(
+  presets: [
+    LightDarkThemePreset(
+      id: 'clean',
+      name: 'Clean',
       light: ThemeVariant(
-        id: 'clean-light',
-        name: 'Clean Light',
+        themePresetId: 'clean',
+        brightness: ThemeVariantBrightness.light,
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.blue,
@@ -77,8 +79,8 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
         tokens: cleanLightTokens,
       ),
       dark: ThemeVariant(
-        id: 'clean-dark',
-        name: 'Clean Dark',
+        themePresetId: 'clean',
+        brightness: ThemeVariantBrightness.dark,
         themeData: ThemeData(
           brightness: Brightness.dark,
           colorSchemeSeed: Colors.indigo,
@@ -87,10 +89,12 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
         tokens: cleanDarkTokens,
       ),
     ),
-    'forest': LightDarkThemeVariant(
+    LightDarkThemePreset(
+      id: 'forest',
+      name: 'Forest',
       light: ThemeVariant(
-        id: 'forest-light',
-        name: 'Forest Light',
+        themePresetId: 'forest',
+        brightness: ThemeVariantBrightness.light,
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.green,
@@ -99,8 +103,8 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
         tokens: forestLightTokens,
       ),
       dark: ThemeVariant(
-        id: 'forest-dark',
-        name: 'Forest Dark',
+        themePresetId: 'forest',
+        brightness: ThemeVariantBrightness.dark,
         themeData: ThemeData(
           brightness: Brightness.dark,
           colorSchemeSeed: Colors.teal,
@@ -109,10 +113,12 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
         tokens: forestDarkTokens,
       ),
     ),
-    'mono': SingleThemeVariant(
-      ThemeVariant(
-        id: 'mono',
-        name: 'Mono',
+    SingleThemePreset(
+      id: 'mono',
+      name: 'Mono',
+      theme: ThemeVariant(
+        themePresetId: 'mono',
+        brightness: ThemeVariantBrightness.single,
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.black,
@@ -121,5 +127,5 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
         tokens: monoTokens,
       ),
     ),
-  },
+  ],
 );

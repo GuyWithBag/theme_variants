@@ -8,7 +8,6 @@ void main() {
   ) async {
     await tester.pumpWidget(const App());
 
-    expect(find.text('Clean Light'), findsOneWidget);
     expect(find.text('Active theme: Clean Light'), findsOneWidget);
     expect(find.text('Primary large'), findsOneWidget);
     expect(find.text('Danger small'), findsOneWidget);
@@ -25,7 +24,6 @@ void main() {
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Forest Dark'), findsOneWidget);
     expect(find.text('Active theme: Forest Dark'), findsOneWidget);
   });
 
@@ -34,10 +32,9 @@ void main() {
 
     await tester.tap(find.byType(DropdownButton<String>).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Forest light').last);
+    await tester.tap(find.text('Forest Light').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('Forest Light'), findsOneWidget);
     expect(find.text('Active theme: Forest Light'), findsOneWidget);
   });
 }

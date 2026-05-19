@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
-/// A named app theme with Material [ThemeData] and user-defined tokens.
+/// The brightness slot a [ThemeVariant] occupies inside a theme preset.
+enum ThemeVariantBrightness { single, light, dark }
+
+/// A concrete theme payload within a theme preset.
 class ThemeVariant<TTokens> {
   const ThemeVariant({
-    required this.id,
-    required this.name,
+    required this.themePresetId,
+    required this.brightness,
     required this.themeData,
     required this.tokens,
   });
 
-  final String id;
-  final String name;
+  final String themePresetId;
+  final ThemeVariantBrightness brightness;
   final ThemeData themeData;
   final TTokens tokens;
 }

@@ -12,15 +12,18 @@ class HomePage extends StatelessWidget {
     final controller = context.themeVariantsController<AppTokens>();
     final tokens = context.themeTokens<AppTokens>();
     final activeTheme = context.activeThemeVariant<AppTokens>();
+    final activePreset = context.activeThemePreset<AppTokens>();
+    final themeIds = controller.registry.ids.toList(growable: false);
+    final activeThemeLabel = activePreset.themeLabel(activeTheme.brightness);
 
     return Scaffold(
-      appBar: AppBar(title: Text(activeTheme.name)),
+      appBar: AppBar(title: Text(activeThemeLabel)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Active theme: ${activeTheme.name}'),
+            Text('Active theme: $activeThemeLabel'),
             Text(
               'radius ${tokens.radius.toStringAsFixed(0)} / spacing ${tokens.spaceSm.toStringAsFixed(0)}-${tokens.spaceLg.toStringAsFixed(0)}',
             ),
@@ -66,10 +69,16 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 16),
             DropdownButton<String>(
               value: controller.lightThemeId,
-              items: const [
-                DropdownMenuItem(value: 'clean', child: Text('Clean light')),
-                DropdownMenuItem(value: 'forest', child: Text('Forest light')),
-                DropdownMenuItem(value: 'mono', child: Text('Mono')),
+              items: [
+                for (final id in themeIds)
+                  DropdownMenuItem(
+                    value: id,
+                    child: Text(
+                      controller.registry
+                          .preset(id)
+                          .themeLabel(ThemeVariantBrightness.light),
+                    ),
+                  ),
               ],
               onChanged: (value) {
                 if (value != null) controller.setLightTheme(value);
@@ -77,10 +86,16 @@ class HomePage extends StatelessWidget {
             ),
             DropdownButton<String>(
               value: controller.darkThemeId,
-              items: const [
-                DropdownMenuItem(value: 'clean', child: Text('Clean dark')),
-                DropdownMenuItem(value: 'forest', child: Text('Forest dark')),
-                DropdownMenuItem(value: 'mono', child: Text('Mono')),
+              items: [
+                for (final id in themeIds)
+                  DropdownMenuItem(
+                    value: id,
+                    child: Text(
+                      controller.registry
+                          .preset(id)
+                          .themeLabel(ThemeVariantBrightness.dark),
+                    ),
+                  ),
               ],
               onChanged: (value) {
                 if (value != null) controller.setDarkTheme(value);
@@ -139,6 +154,7 @@ class _FlashcardSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
     final activeTheme = context.activeThemeVariant<AppTokens>();
+    final activePreset = context.activeThemePreset<AppTokens>();
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -155,7 +171,9 @@ class _FlashcardSurface extends StatelessWidget {
             const SizedBox(height: 4),
             Text(subtitle),
             const SizedBox(height: 12),
-            Text('Card theme: ${activeTheme.name}'),
+            Text(
+              'Card theme: ${activePreset.themeLabel(activeTheme.brightness)}',
+            ),
             const SizedBox(height: 12),
             FilledButton(
               style: buttonStyle.resolve(tokens),
@@ -166,5 +184,16 @@ class _FlashcardSurface extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+extension on ThemePreset<AppTokens> {
+  String themeLabel(ThemeVariantBrightness brightness) {
+    return switch ((presetType, brightness)) {
+      (ThemePresetType.lightDark, ThemeVariantBrightness.light) =>
+        '$name Light',
+      (ThemePresetType.lightDark, ThemeVariantBrightness.dark) => '$name Dark',
+      _ => name,
+    };
   }
 }

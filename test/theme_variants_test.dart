@@ -17,15 +17,39 @@ class TestTokens {
   final Color primary;
 }
 
-ThemeVariant<TestTokens> theme(String id, Brightness brightness, String name) {
+ThemeVariant<TestTokens> theme(
+  String themePresetId,
+  ThemeVariantBrightness brightness,
+) {
+  final themeBrightness = brightness == ThemeVariantBrightness.dark
+      ? Brightness.dark
+      : Brightness.light;
+
   return ThemeVariant<TestTokens>(
+    themePresetId: themePresetId,
+    brightness: brightness,
+    themeData: ThemeData(brightness: themeBrightness),
+    tokens: TestTokens(
+      radius: themeBrightness == Brightness.dark ? 16 : 8,
+      primary: themeBrightness == Brightness.dark ? Colors.indigo : Colors.blue,
+    ),
+  );
+}
+
+SingleThemePreset<TestTokens> singlePreset(String id, String name) {
+  return SingleThemePreset<TestTokens>(
     id: id,
     name: name,
-    themeData: ThemeData(brightness: brightness),
-    tokens: TestTokens(
-      radius: brightness == Brightness.dark ? 16 : 8,
-      primary: brightness == Brightness.dark ? Colors.indigo : Colors.blue,
-    ),
+    theme: theme(id, ThemeVariantBrightness.single),
+  );
+}
+
+LightDarkThemePreset<TestTokens> lightDarkPreset(String id, String name) {
+  return LightDarkThemePreset<TestTokens>(
+    id: id,
+    name: name,
+    light: theme(id, ThemeVariantBrightness.light),
+    dark: theme(id, ThemeVariantBrightness.dark),
   );
 }
 
@@ -33,51 +57,39 @@ void main() {
   group('ThemeVariantRegistry', () {
     test('resolves single themes for both brightnesses', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'minimal': SingleThemeVariant(
-            theme('minimal', Brightness.light, 'minimal'),
-          ),
-        },
+        presets: [singlePreset('minimal', 'minimal')],
       );
 
       expect(
-        registry.resolve(id: 'minimal', brightness: Brightness.light).name,
+        registry
+            .resolve(id: 'minimal', brightness: Brightness.light)
+            .themePresetId,
         'minimal',
       );
       expect(
-        registry.resolve(id: 'minimal', brightness: Brightness.dark).name,
-        'minimal',
+        registry.resolve(id: 'minimal', brightness: Brightness.dark).brightness,
+        ThemeVariantBrightness.single,
       );
     });
 
     test('resolves light and dark theme pairs', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'brand': LightDarkThemeVariant(
-            light: theme('brand-light', Brightness.light, 'brand light'),
-            dark: theme('brand-dark', Brightness.dark, 'brand dark'),
-          ),
-        },
+        presets: [lightDarkPreset('brand', 'Brand')],
       );
 
       expect(
-        registry.resolve(id: 'brand', brightness: Brightness.light).name,
-        'brand light',
+        registry.resolve(id: 'brand', brightness: Brightness.light).brightness,
+        ThemeVariantBrightness.light,
       );
       expect(
-        registry.resolve(id: 'brand', brightness: Brightness.dark).name,
-        'brand dark',
+        registry.resolve(id: 'brand', brightness: Brightness.dark).brightness,
+        ThemeVariantBrightness.dark,
       );
     });
 
     test('exposes registered ids', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'mono': SingleThemeVariant(theme('mono', Brightness.light, 'mono')),
-        },
+        presets: [singlePreset('clean', 'clean'), singlePreset('mono', 'mono')],
       );
 
       expect(registry.ids, containsAll(['clean', 'mono']));
@@ -85,11 +97,7 @@ void main() {
 
     test('unknown id errors include available ids', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-        },
+        presets: [singlePreset('clean', 'clean')],
       );
 
       expect(
@@ -108,15 +116,10 @@ void main() {
   group('ThemeVariantsController', () {
     test('uses independently selected light and dark themes', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': LightDarkThemeVariant(
-            light: theme('clean-light', Brightness.light, 'clean light'),
-            dark: theme('clean-dark', Brightness.dark, 'clean dark'),
-          ),
-          'midnight': SingleThemeVariant(
-            theme('midnight', Brightness.dark, 'midnight'),
-          ),
-        },
+        presets: [
+          lightDarkPreset('clean', 'clean'),
+          singlePreset('midnight', 'midnight'),
+        ],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -124,21 +127,16 @@ void main() {
         darkThemeId: 'midnight',
       );
 
-      expect(controller.lightTheme().name, 'clean light');
-      expect(controller.darkTheme().name, 'midnight');
+      expect(controller.lightTheme().themePresetId, 'clean');
+      expect(controller.darkTheme().themePresetId, 'midnight');
     });
 
     test('resolves active theme from ThemeMode', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': LightDarkThemeVariant(
-            light: theme('clean-light', Brightness.light, 'clean light'),
-            dark: theme('clean-dark', Brightness.dark, 'clean dark'),
-          ),
-          'midnight': SingleThemeVariant(
-            theme('midnight', Brightness.dark, 'midnight'),
-          ),
-        },
+        presets: [
+          lightDarkPreset('clean', 'clean'),
+          singlePreset('midnight', 'midnight'),
+        ],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -146,20 +144,16 @@ void main() {
         darkThemeId: 'midnight',
       );
 
-      expect(controller.activeTheme(Brightness.dark).name, 'midnight');
+      expect(controller.activeTheme(Brightness.dark).themePresetId, 'midnight');
 
       controller.setThemeMode(ThemeMode.light);
 
-      expect(controller.activeTheme(Brightness.dark).name, 'clean light');
+      expect(controller.activeTheme(Brightness.dark).themePresetId, 'clean');
     });
 
     test('applies theme transforms to resolved themes', () {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-        },
+        presets: [singlePreset('clean', 'clean')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -167,8 +161,8 @@ void main() {
         darkThemeId: 'clean',
         transform: (theme) {
           return ThemeVariant<TestTokens>(
-            id: theme.id,
-            name: '${theme.name} customized',
+            themePresetId: theme.themePresetId,
+            brightness: theme.brightness,
             themeData: theme.themeData.copyWith(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
             ),
@@ -179,7 +173,7 @@ void main() {
 
       final resolved = controller.lightTheme();
 
-      expect(resolved.name, 'clean customized');
+      expect(resolved.themePresetId, 'clean');
       expect(resolved.tokens.radius, 24);
       expect(resolved.tokens.primary, Colors.purple);
     });
@@ -188,11 +182,7 @@ void main() {
   group('ThemeVariantsProvider', () {
     testWidgets('exposes active tokens from context', (tester) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-        },
+        presets: [singlePreset('clean', 'clean')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -207,7 +197,7 @@ void main() {
             builder: (context) {
               return Directionality(
                 textDirection: TextDirection.ltr,
-                child: Text(context.activeThemeVariant<TestTokens>().name),
+                child: Text(context.activeThemePreset<TestTokens>().name),
               );
             },
           ),
@@ -221,11 +211,7 @@ void main() {
       tester,
     ) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-        },
+        presets: [singlePreset('clean', 'clean')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -240,7 +226,7 @@ void main() {
             builder: (context) {
               return Directionality(
                 textDirection: TextDirection.ltr,
-                child: Text(context.activeThemeVariant<TestTokens>().name),
+                child: Text(context.activeThemePreset<TestTokens>().name),
               );
             },
           ),
@@ -254,12 +240,7 @@ void main() {
       tester,
     ) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
-        },
+        presets: [singlePreset('clean', 'clean'), singlePreset('card', 'card')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -277,7 +258,7 @@ void main() {
               builder: (context) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(context.activeThemeVariant<TestTokens>().name),
+                  child: Text(context.activeThemePreset<TestTokens>().name),
                 );
               },
             ),
@@ -290,12 +271,7 @@ void main() {
 
     testWidgets('disabled override inherits the parent theme', (tester) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
-        },
+        presets: [singlePreset('clean', 'clean'), singlePreset('card', 'card')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -314,7 +290,7 @@ void main() {
               builder: (context) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(context.activeThemeVariant<TestTokens>().name),
+                  child: Text(context.activeThemePreset<TestTokens>().name),
                 );
               },
             ),
@@ -327,16 +303,10 @@ void main() {
 
     testWidgets('override can fix its own brightness mode', (tester) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': LightDarkThemeVariant(
-            light: theme('clean-light', Brightness.light, 'clean light'),
-            dark: theme('clean-dark', Brightness.dark, 'clean dark'),
-          ),
-          'card': LightDarkThemeVariant(
-            light: theme('card-light', Brightness.light, 'card light'),
-            dark: theme('card-dark', Brightness.dark, 'card dark'),
-          ),
-        },
+        presets: [
+          lightDarkPreset('clean', 'clean'),
+          lightDarkPreset('card', 'card'),
+        ],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -358,7 +328,7 @@ void main() {
                 builder: (context) {
                   return Directionality(
                     textDirection: TextDirection.ltr,
-                    child: Text(context.activeThemeVariant<TestTokens>().name),
+                    child: Text(context.activeThemePreset<TestTokens>().name),
                   );
                 },
               ),
@@ -367,17 +337,12 @@ void main() {
         ),
       );
 
-      expect(find.text('card light'), findsOneWidget);
+      expect(find.text('card'), findsOneWidget);
     });
 
     testWidgets('override inherits the parent theme transform', (tester) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
-        },
+        presets: [singlePreset('clean', 'clean'), singlePreset('card', 'card')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -385,13 +350,10 @@ void main() {
         darkThemeId: 'clean',
         transform: (theme) {
           return ThemeVariant<TestTokens>(
-            id: theme.id,
-            name: '${theme.name} transformed',
+            themePresetId: theme.themePresetId,
+            brightness: theme.brightness,
             themeData: theme.themeData,
-            tokens: TestTokens(
-              radius: theme.tokens.radius,
-              primary: theme.tokens.primary,
-            ),
+            tokens: TestTokens(radius: 24, primary: theme.tokens.primary),
           );
         },
       );
@@ -404,9 +366,10 @@ void main() {
             darkThemeId: 'card',
             child: Builder(
               builder: (context) {
+                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(context.activeThemeVariant<TestTokens>().name),
+                  child: Text(tokens.radius.toStringAsFixed(0)),
                 );
               },
             ),
@@ -414,21 +377,17 @@ void main() {
         ),
       );
 
-      expect(find.text('card transformed'), findsOneWidget);
+      expect(find.text('24'), findsOneWidget);
     });
 
     testWidgets('override follows parent theme changes when ids are omitted', (
       tester,
     ) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'forest': SingleThemeVariant(
-            theme('forest', Brightness.light, 'forest'),
-          ),
-        },
+        presets: [
+          singlePreset('clean', 'clean'),
+          singlePreset('forest', 'forest'),
+        ],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -445,7 +404,7 @@ void main() {
               builder: (context) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(context.activeThemeVariant<TestTokens>().name),
+                  child: Text(context.activeThemePreset<TestTokens>().name),
                 );
               },
             ),
@@ -463,12 +422,7 @@ void main() {
 
     testWidgets('override updates when enabled toggles', (tester) async {
       final registry = ThemeVariantRegistry<TestTokens>(
-        themes: {
-          'clean': SingleThemeVariant(
-            theme('clean', Brightness.light, 'clean'),
-          ),
-          'card': SingleThemeVariant(theme('card', Brightness.light, 'card')),
-        },
+        presets: [singlePreset('clean', 'clean'), singlePreset('card', 'card')],
       );
       final controller = ThemeVariantsController<TestTokens>(
         registry: registry,
@@ -487,7 +441,7 @@ void main() {
               builder: (context) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(context.activeThemeVariant<TestTokens>().name),
+                  child: Text(context.activeThemePreset<TestTokens>().name),
                 );
               },
             ),
