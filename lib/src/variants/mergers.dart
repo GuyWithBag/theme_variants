@@ -165,7 +165,29 @@ BoxDecoration mergeBoxDecoration(BoxDecoration base, BoxDecoration next) {
 SurfaceStyle mergeSurfaceStyle(SurfaceStyle base, SurfaceStyle next) {
   return SurfaceStyle(
     decoration: mergeBoxDecoration(base.decoration, next.decoration),
+    foregroundDecoration: switch ((
+      base.foregroundDecoration,
+      next.foregroundDecoration,
+    )) {
+      (final baseDecoration?, final nextDecoration?) => mergeBoxDecoration(
+        baseDecoration,
+        nextDecoration,
+      ),
+      (_, final nextDecoration?) => nextDecoration,
+      (final baseDecoration?, _) => baseDecoration,
+      _ => null,
+    },
     contentStyle: mergeContentStyle(base.contentStyle, next.contentStyle),
+    alignment: next.alignment ?? base.alignment,
+    padding: next.padding ?? base.padding,
+    margin: next.margin ?? base.margin,
+    width: next.width ?? base.width,
+    height: next.height ?? base.height,
+    constraints: next.constraints ?? base.constraints,
+    transform: next.transform ?? base.transform,
+    transformAlignment: next.transformAlignment ?? base.transformAlignment,
+    clipBehavior: next.clipBehavior ?? base.clipBehavior,
+    opacity: next.opacity ?? base.opacity,
   );
 }
 
@@ -174,5 +196,11 @@ ContentStyle mergeContentStyle(ContentStyle base, ContentStyle next) {
   return ContentStyle(
     textStyle: mergeTextStyle(base.textStyle, next.textStyle),
     iconTheme: mergeIconThemeData(base.iconTheme, next.iconTheme),
+    textAlign: next.textAlign ?? base.textAlign,
+    softWrap: next.softWrap ?? base.softWrap,
+    overflow: next.overflow ?? base.overflow,
+    maxLines: next.maxLines ?? base.maxLines,
+    textWidthBasis: next.textWidthBasis ?? base.textWidthBasis,
+    textHeightBehavior: next.textHeightBehavior ?? base.textHeightBehavior,
   );
 }
