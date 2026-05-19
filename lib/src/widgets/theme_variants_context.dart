@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../controller/theme_variants_controller.dart';
 import '../theme/theme_variant.dart';
-import '../theme/theme_variant_entry.dart';
+import '../theme/theme_preset.dart';
 import 'theme_variants_provider.dart';
 
 /// Convenience accessors for theme variants from a [BuildContext].

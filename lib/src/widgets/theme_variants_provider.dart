@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../controller/theme_variants_controller.dart';
 import '../theme/theme_variant.dart';
-import '../theme/theme_variant_entry.dart';
+import '../theme/theme_preset.dart';
 
 /// Exposes a [ThemeVariantsController] to the widget tree.
 class ThemeVariantsProvider<TTokens>

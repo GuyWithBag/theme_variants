@@ -1,6 +1,6 @@
 export 'src/controller/theme_variants_controller.dart';
 export 'src/theme/theme_variant.dart';
-export 'src/theme/theme_variant_entry.dart';
+export 'src/theme/theme_preset.dart';
 export 'src/theme/theme_variant_registry.dart';
 export 'src/variants/compound_variant.dart';
 export 'src/variants/mergers.dart';

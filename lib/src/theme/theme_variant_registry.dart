@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'theme_variant.dart';
-import 'theme_variant_entry.dart';
+import 'theme_preset.dart';
 
 /// Stores all named themes an app can choose from.
 class ThemeVariantRegistry<TTokens> {
@@ -49,6 +49,47 @@ class ThemeVariantRegistry<TTokens> {
   /// Returns only presets with a single shared theme.
   Iterable<SingleThemePreset<TTokens>> getSingleThemes() {
     return presets.values.whereType<SingleThemePreset<TTokens>>();
+  }
+
+  /// Returns a new registry with one preset added or replaced by id.
+  ThemeVariantRegistry<TTokens> addTheme(ThemePreset<TTokens> preset) {
+    final next = Map<String, ThemePreset<TTokens>>.from(presets);
+    next[preset.id] = preset;
+    return ThemeVariantRegistry<TTokens>(presets: next.values);
+  }
+
+  /// Returns a new registry with all provided presets added or replaced by id.
+  ThemeVariantRegistry<TTokens> addThemes(
+    Iterable<ThemePreset<TTokens>> values,
+  ) {
+    final next = Map<String, ThemePreset<TTokens>>.from(presets);
+    for (final preset in values) {
+      next[preset.id] = preset;
+    }
+    return ThemeVariantRegistry<TTokens>(presets: next.values);
+  }
+
+  /// Returns a new registry with one preset removed by id.
+  ThemeVariantRegistry<TTokens> removeTheme(String id) {
+    if (!presets.containsKey(id)) return this;
+    final next = Map<String, ThemePreset<TTokens>>.from(presets)..remove(id);
+    return ThemeVariantRegistry<TTokens>(presets: next.values);
+  }
+
+  /// Returns a new registry with all provided ids removed.
+  ThemeVariantRegistry<TTokens> removeThemes(Iterable<String> ids) {
+    final next = Map<String, ThemePreset<TTokens>>.from(presets);
+    var changed = false;
+    for (final id in ids) {
+      changed = next.remove(id) != null || changed;
+    }
+    if (!changed) return this;
+    return ThemeVariantRegistry<TTokens>(presets: next.values);
+  }
+
+  /// Returns an empty registry.
+  ThemeVariantRegistry<TTokens> clear() {
+    return ThemeVariantRegistry<TTokens>(presets: const []);
   }
 
   /// Resolves a concrete variant by preset id and requested brightness.
