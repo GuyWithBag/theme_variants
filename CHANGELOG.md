@@ -1,3 +1,24 @@
+## 0.1.0
+
+* Breaking: replaced theme entries with preset-based theme models. Use
+  `LightDarkThemePreset` and `SingleThemePreset` to group concrete
+  `ThemeVariant` values under stable preset ids and names.
+* Breaking: `ThemeVariant` now identifies its preset with `themePresetId` and
+  `brightness` instead of a standalone variant id.
+* Added registry helpers for listing all themes, light themes, dark themes,
+  single themes, and resolving current presets.
+* Added controller and registry import/export helpers with `ThemeImportMode`
+  support for add-only, replace-and-add, and replace-only workflows.
+* Added `ContentStyle` and `SurfaceStyle` for resolving paired text/icon and
+  surface/content styles.
+* Added the `Surface` widget for applying resolved surface styles to a subtree.
+* Added `VariantStyle.content`, `VariantStyle.contentParts`,
+  `VariantStyle.surface`, and `VariantStyle.surfaceParts`.
+* Added `SurfaceStylePart` and `ContentStylePart` helpers, including support
+  for content text layout and surface layout fields.
+* Updated the example app and README to use preset-based theme registration and
+  persistence-friendly import/export patterns.
+
 ## 0.0.1
 
 * Initial release.
