@@ -5,16 +5,21 @@ import 'theme_variant_entry.dart';
 
 /// Stores all named themes an app can choose from.
 class ThemeVariantRegistry<TTokens> {
+  /// Creates a registry from preset definitions, indexed by preset id.
   ThemeVariantRegistry({required Iterable<ThemePreset<TTokens>> presets})
     : presets = Map.unmodifiable(_indexPresets(presets));
 
+  /// Presets indexed by id.
   final Map<String, ThemePreset<TTokens>> presets;
 
+  /// All registered preset ids.
   Iterable<String> get ids => presets.keys;
 
+  /// Whether a preset id exists in this registry.
   bool contains(String id) => presets.containsKey(id);
 
-  ThemePreset<TTokens> preset(String id) {
+  /// Returns a preset by id or throws when missing.
+  ThemePreset<TTokens> getPreset(String id) {
     final preset = presets[id];
     if (preset == null) {
       final available = ids.isEmpty ? 'none' : ids.join(', ');
@@ -28,25 +33,30 @@ class ThemeVariantRegistry<TTokens> {
     return preset;
   }
 
+  /// Returns all registered presets.
   Iterable<ThemePreset<TTokens>> getThemes() => presets.values;
 
+  /// Returns variants resolved in light mode for all presets.
   Iterable<ThemeVariant<TTokens>> getLightThemes() {
     return presets.values.map((preset) => preset.resolve(Brightness.light));
   }
 
+  /// Returns variants resolved in dark mode for all presets.
   Iterable<ThemeVariant<TTokens>> getDarkThemes() {
     return presets.values.map((preset) => preset.resolve(Brightness.dark));
   }
 
+  /// Returns only presets with a single shared theme.
   Iterable<SingleThemePreset<TTokens>> getSingleThemes() {
     return presets.values.whereType<SingleThemePreset<TTokens>>();
   }
 
+  /// Resolves a concrete variant by preset id and requested brightness.
   ThemeVariant<TTokens> resolve({
     required String id,
     required Brightness brightness,
   }) {
-    return preset(id).resolve(brightness);
+    return getPreset(id).resolve(brightness);
   }
 
   static Map<String, ThemePreset<TTokens>> _indexPresets<TTokens>(

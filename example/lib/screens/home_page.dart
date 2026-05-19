@@ -75,7 +75,7 @@ class HomePage extends StatelessWidget {
                     value: id,
                     child: Text(
                       controller.registry
-                          .preset(id)
+                          .getPreset(id)
                           .themeLabel(ThemeVariantBrightness.light),
                     ),
                   ),
@@ -92,7 +92,7 @@ class HomePage extends StatelessWidget {
                     value: id,
                     child: Text(
                       controller.registry
-                          .preset(id)
+                          .getPreset(id)
                           .themeLabel(ThemeVariantBrightness.dark),
                     ),
                   ),
@@ -188,6 +188,7 @@ class _FlashcardSurface extends StatelessWidget {
 }
 
 extension on ThemePreset<AppTokens> {
+  /// Builds a display label from preset metadata and variant brightness.
   String themeLabel(ThemeVariantBrightness brightness) {
     return switch ((presetType, brightness)) {
       (ThemePresetType.lightDark, ThemeVariantBrightness.light) =>

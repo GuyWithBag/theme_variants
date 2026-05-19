@@ -31,16 +31,22 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
   ThemeMode _themeMode;
   ThemeVariantTransformer<TTokens>? _transform;
 
+  /// Active registry used to resolve preset ids into concrete themes.
   ThemeVariantRegistry<TTokens> get registry => _registry;
 
+  /// Selected preset id for light mode.
   String get lightThemeId => _lightThemeId;
 
+  /// Selected preset id for dark mode.
   String get darkThemeId => _darkThemeId;
 
+  /// Current theme mode policy.
   ThemeMode get themeMode => _themeMode;
 
+  /// Optional transform applied to resolved variants.
   ThemeVariantTransformer<TTokens>? get transform => _transform;
 
+  /// Replaces the registry and validates selected preset ids.
   set registry(ThemeVariantRegistry<TTokens> value) {
     if (identical(value, _registry)) return;
 
@@ -50,6 +56,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Selects the preset id used for light mode.
   void setLightTheme(String id) {
     _assertRegistered(id);
     if (id == _lightThemeId) return;
@@ -58,6 +65,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Selects the preset id used for dark mode.
   void setDarkTheme(String id) {
     _assertRegistered(id);
     if (id == _darkThemeId) return;
@@ -66,6 +74,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the active [ThemeMode].
   void setThemeMode(ThemeMode mode) {
     if (mode == _themeMode) return;
 
@@ -73,6 +82,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the optional variant transform.
   void setTransform(ThemeVariantTransformer<TTokens>? transform) {
     if (identical(transform, _transform)) return;
 
@@ -80,49 +90,28 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     notifyListeners();
   }
 
-  ThemeVariant<TTokens> lightTheme() {
+  /// Resolves the current light-mode variant.
+  ThemeVariant<TTokens> getCurrentLightTheme() {
     return _applyTransform(
       _registry.resolve(id: _lightThemeId, brightness: Brightness.light),
     );
   }
 
-  ThemeVariant<TTokens> getCurrentLightTheme() => lightTheme();
+  /// Resolves the current light-mode variant.
+  ThemeVariant<TTokens> lightTheme() => getCurrentLightTheme();
 
-  ThemeVariant<TTokens> darkTheme() {
+  /// Resolves the current dark-mode variant.
+  ThemeVariant<TTokens> getCurrentDarkTheme() {
     return _applyTransform(
       _registry.resolve(id: _darkThemeId, brightness: Brightness.dark),
     );
   }
 
-  ThemeVariant<TTokens> getCurrentDarkTheme() => darkTheme();
+  /// Resolves the current dark-mode variant.
+  ThemeVariant<TTokens> darkTheme() => getCurrentDarkTheme();
 
-  ThemeVariant<TTokens> activeTheme(Brightness platformBrightness) {
-    final brightness = switch (_themeMode) {
-      ThemeMode.light => Brightness.light,
-      ThemeMode.dark => Brightness.dark,
-      ThemeMode.system => platformBrightness,
-    };
-
-    return brightness == Brightness.dark ? darkTheme() : lightTheme();
-  }
-
+  /// Resolves the active variant based on [platformBrightness] and [themeMode].
   ThemeVariant<TTokens> getCurrentTheme(Brightness platformBrightness) {
-    return activeTheme(platformBrightness);
-  }
-
-  ThemePreset<TTokens> lightThemePreset() {
-    return _registry.preset(_lightThemeId);
-  }
-
-  ThemePreset<TTokens> getCurrentLightThemePreset() => lightThemePreset();
-
-  ThemePreset<TTokens> darkThemePreset() {
-    return _registry.preset(_darkThemeId);
-  }
-
-  ThemePreset<TTokens> getCurrentDarkThemePreset() => darkThemePreset();
-
-  ThemePreset<TTokens> activeThemePreset(Brightness platformBrightness) {
     final brightness = switch (_themeMode) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
@@ -130,12 +119,36 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     };
 
     return brightness == Brightness.dark
-        ? darkThemePreset()
-        : lightThemePreset();
+        ? getCurrentDarkTheme()
+        : getCurrentLightTheme();
   }
 
+  /// Resolves the active variant based on [platformBrightness] and [themeMode].
+  ThemeVariant<TTokens> activeTheme(Brightness platformBrightness) {
+    return getCurrentTheme(platformBrightness);
+  }
+
+  /// Returns the selected light-mode preset definition.
+  ThemePreset<TTokens> getCurrentLightThemePreset() {
+    return _registry.getPreset(_lightThemeId);
+  }
+
+  /// Returns the selected dark-mode preset definition.
+  ThemePreset<TTokens> getCurrentDarkThemePreset() {
+    return _registry.getPreset(_darkThemeId);
+  }
+
+  /// Returns the active preset definition for [platformBrightness].
   ThemePreset<TTokens> getCurrentThemePreset(Brightness platformBrightness) {
-    return activeThemePreset(platformBrightness);
+    final brightness = switch (_themeMode) {
+      ThemeMode.light => Brightness.light,
+      ThemeMode.dark => Brightness.dark,
+      ThemeMode.system => platformBrightness,
+    };
+
+    return brightness == Brightness.dark
+        ? getCurrentDarkThemePreset()
+        : getCurrentLightThemePreset();
   }
 
   ThemeVariant<TTokens> _applyTransform(ThemeVariant<TTokens> theme) {

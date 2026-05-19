@@ -13,6 +13,7 @@ class ThemeVariantsProvider<TTokens>
     super.key,
   }) : super(notifier: controller);
 
+  /// Reads the nearest [ThemeVariantsController] from context.
   static ThemeVariantsController<TTokens> controllerOf<TTokens>(
     BuildContext context, {
     bool listen = true,
@@ -41,25 +42,28 @@ class ThemeVariantsProvider<TTokens>
     return provider.notifier!;
   }
 
-  static ThemeVariant<TTokens> activeThemeOf<TTokens>(
+  /// Resolves the currently active concrete theme variant from context.
+  static ThemeVariant<TTokens> themeOf<TTokens>(
     BuildContext context, {
     bool listen = true,
   }) {
     final controller = controllerOf<TTokens>(context, listen: listen);
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
-    return controller.activeTheme(platformBrightness);
+    return controller.getCurrentTheme(platformBrightness);
   }
 
-  static ThemePreset<TTokens> activeThemePresetOf<TTokens>(
+  /// Resolves the currently active preset definition from context.
+  static ThemePreset<TTokens> themePresetOf<TTokens>(
     BuildContext context, {
     bool listen = true,
   }) {
     final controller = controllerOf<TTokens>(context, listen: listen);
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
-    return controller.activeThemePreset(platformBrightness);
+    return controller.getCurrentThemePreset(platformBrightness);
   }
 
+  /// Reads active theme tokens from context.
   static TTokens tokensOf<TTokens>(BuildContext context, {bool listen = true}) {
-    return activeThemeOf<TTokens>(context, listen: listen).tokens;
+    return themeOf<TTokens>(context, listen: listen).tokens;
   }
 }
