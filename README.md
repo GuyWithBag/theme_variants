@@ -112,6 +112,41 @@ final buttonStyle = VariantStyle.button<AppTokens>(
 );
 ```
 
+Or you can use parts for a cleaner syntax:
+
+```dart
+final buttonStyle = VariantStyle.buttonParts<AppTokens>(
+  base: (tokens) => {
+    ButtonStylePart.shape(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(tokens.radius),
+      ),
+    ),
+  },
+  defaultVariants: const [ButtonSize.md, ButtonTone.primary],
+  variants: {
+    ButtonSize.sm: (_) => {
+      ButtonStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+    },
+    ButtonSize.lg: (_) => {
+      ButtonStylePart.padding(
+        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      ),
+    },
+    ButtonTone.primary: (tokens) => {
+      ButtonStylePart.backgroundColor(tokens.primary),
+      ButtonStylePart.foregroundColor(tokens.onPrimary),
+    },
+    ButtonTone.danger: (tokens) => {
+      ButtonStylePart.backgroundColor(tokens.danger),
+      ButtonStylePart.foregroundColor(tokens.onDanger),
+    },
+  },
+);
+```
+
 Resolve it inside a widget:
 
 ```dart
