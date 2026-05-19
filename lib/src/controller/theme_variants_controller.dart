@@ -205,7 +205,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
   }
 
   /// Exports controller state and preset definitions to a map.
-  Map<String, Object?> exportToMap({
+  Map<String, Object?> toMap({
     required ThemeDataMapEncoder encodeThemeData,
     required ThemeTokensMapEncoder<TTokens> encodeTokens,
   }) {
@@ -226,7 +226,7 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
   }
 
   /// Imports controller state and preset definitions from a map.
-  void importFromMap(
+  void fromMap(
     Map<String, Object?> map, {
     required ThemeDataMapDecoder decodeThemeData,
     required ThemeTokensMapDecoder<TTokens> decodeTokens,
