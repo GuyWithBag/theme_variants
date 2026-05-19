@@ -332,74 +332,26 @@ class SurfaceStylePart {
   }
 
   static StylePart<SurfaceStyle> text(Iterable<StylePart<TextStyle>> parts) {
-    return content({ContentStylePart.text(parts)});
+    return _content({ContentStylePart.text(parts)});
   }
 
   static StylePart<SurfaceStyle> icon(
     Iterable<StylePart<IconThemeData>> parts,
   ) {
-    return content({ContentStylePart.icon(parts)});
+    return _content({ContentStylePart.icon(parts)});
   }
 
-  static StylePart<SurfaceStyle> content(
+  static StylePart<SurfaceStyle> _content(
     Iterable<StylePart<ContentStyle>> parts,
   ) {
     return (style) => style.copyWith(
       contentStyle: applyStyleParts<ContentStyle>(style.contentStyle, parts),
     );
   }
-
-  static StylePart<SurfaceStyle> color(Color color) {
-    return decoration({DecorationPart.color(color)});
-  }
-
-  static StylePart<SurfaceStyle> border(BoxBorder border) {
-    return decoration({DecorationPart.border(border)});
-  }
-
-  static StylePart<SurfaceStyle> borderRadius(BorderRadiusGeometry radius) {
-    return decoration({DecorationPart.borderRadius(radius)});
-  }
-
-  static StylePart<SurfaceStyle> radius(double radius) {
-    return decoration({DecorationPart.radius(radius)});
-  }
-
-  static StylePart<SurfaceStyle> boxShadow(List<BoxShadow> boxShadow) {
-    return decoration({DecorationPart.boxShadow(boxShadow)});
-  }
-
-  static StylePart<SurfaceStyle> textColor(Color color) {
-    return text({TextStylePart.color(color)});
-  }
-
-  static StylePart<SurfaceStyle> fontSize(double fontSize) {
-    return text({TextStylePart.fontSize(fontSize)});
-  }
-
-  static StylePart<SurfaceStyle> fontWeight(FontWeight fontWeight) {
-    return text({TextStylePart.fontWeight(fontWeight)});
-  }
-
-  static StylePart<SurfaceStyle> iconColor(Color color) {
-    return icon({IconThemePart.color(color)});
-  }
-
-  static StylePart<SurfaceStyle> iconSize(double size) {
-    return icon({IconThemePart.size(size)});
-  }
 }
 
 class ContentStylePart {
   const ContentStylePart._();
-
-  static StylePart<ContentStyle> textStyle(TextStyle textStyle) {
-    return (style) => style.copyWith(textStyle: textStyle);
-  }
-
-  static StylePart<ContentStyle> iconTheme(IconThemeData iconTheme) {
-    return (style) => style.copyWith(iconTheme: iconTheme);
-  }
 
   static StylePart<ContentStyle> text(Iterable<StylePart<TextStyle>> parts) {
     return (style) => style.copyWith(
@@ -413,33 +365,5 @@ class ContentStylePart {
     return (style) => style.copyWith(
       iconTheme: applyStyleParts<IconThemeData>(style.iconTheme, parts),
     );
-  }
-
-  static StylePart<ContentStyle> textStylePart(StylePart<TextStyle> part) {
-    return text({part});
-  }
-
-  static StylePart<ContentStyle> iconThemePart(StylePart<IconThemeData> part) {
-    return icon({part});
-  }
-
-  static StylePart<ContentStyle> textColor(Color color) {
-    return textStylePart(TextStylePart.color(color));
-  }
-
-  static StylePart<ContentStyle> fontSize(double fontSize) {
-    return textStylePart(TextStylePart.fontSize(fontSize));
-  }
-
-  static StylePart<ContentStyle> fontWeight(FontWeight fontWeight) {
-    return textStylePart(TextStylePart.fontWeight(fontWeight));
-  }
-
-  static StylePart<ContentStyle> iconColor(Color color) {
-    return iconThemePart(IconThemePart.color(color));
-  }
-
-  static StylePart<ContentStyle> iconSize(double size) {
-    return iconThemePart(IconThemePart.size(size));
   }
 }
