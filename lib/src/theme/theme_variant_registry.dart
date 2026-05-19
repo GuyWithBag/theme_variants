@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'theme_variant.dart';
 import 'theme_preset.dart';
 
+/// Determines how imported presets are applied to an existing registry.
+enum ThemeImportMode { addOnly, replaceAndAdd, replaceOnly }
+
 /// Stores all named themes an app can choose from.
 class ThemeVariantRegistry<TTokens> {
   /// Creates a registry from preset definitions, indexed by preset id.
@@ -92,6 +95,36 @@ class ThemeVariantRegistry<TTokens> {
     return ThemeVariantRegistry<TTokens>(presets: const []);
   }
 
+  /// Exports all presets to serializable maps.
+  List<Map<String, Object?>> exportThemes({
+    required ThemeVariantMapEncoder<TTokens> encodeVariant,
+  }) {
+    return [
+      for (final preset in getThemes())
+        preset.toMap(encodeVariant: encodeVariant),
+    ];
+  }
+
+  /// Imports presets from maps and returns a new registry based on [mode].
+  ThemeVariantRegistry<TTokens> importThemes(
+    Iterable<Map<String, Object?>> maps, {
+    required ThemeVariantMapDecoder<TTokens> decodeVariant,
+    ThemeImportMode mode = ThemeImportMode.replaceAndAdd,
+  }) {
+    final imported = [
+      for (final map in maps)
+        ThemePreset.fromMap<TTokens>(map, decodeVariant: decodeVariant),
+    ];
+
+    final next = switch (mode) {
+      ThemeImportMode.addOnly => _applyAddOnly(imported),
+      ThemeImportMode.replaceAndAdd => _applyReplaceAndAdd(imported),
+      ThemeImportMode.replaceOnly => _applyReplaceOnly(imported),
+    };
+
+    return ThemeVariantRegistry<TTokens>(presets: next.values);
+  }
+
   /// Resolves a concrete variant by preset id and requested brightness.
   ThemeVariant<TTokens> resolve({
     required String id,
@@ -119,5 +152,31 @@ class ThemeVariantRegistry<TTokens> {
     }
 
     return indexed;
+  }
+
+  Map<String, ThemePreset<TTokens>> _applyAddOnly(
+    Iterable<ThemePreset<TTokens>> imported,
+  ) {
+    final next = Map<String, ThemePreset<TTokens>>.from(presets);
+    for (final preset in imported) {
+      next.putIfAbsent(preset.id, () => preset);
+    }
+    return next;
+  }
+
+  Map<String, ThemePreset<TTokens>> _applyReplaceAndAdd(
+    Iterable<ThemePreset<TTokens>> imported,
+  ) {
+    final next = Map<String, ThemePreset<TTokens>>.from(presets);
+    for (final preset in imported) {
+      next[preset.id] = preset;
+    }
+    return next;
+  }
+
+  Map<String, ThemePreset<TTokens>> _applyReplaceOnly(
+    Iterable<ThemePreset<TTokens>> imported,
+  ) {
+    return {for (final preset in imported) preset.id: preset};
   }
 }

@@ -225,6 +225,19 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
     };
   }
 
+  /// Exports only theme presets.
+  List<Map<String, Object?>> exportThemes({
+    required ThemeDataMapEncoder encodeThemeData,
+    required ThemeTokensMapEncoder<TTokens> encodeTokens,
+  }) {
+    return _registry.exportThemes(
+      encodeVariant: (variant) => variant.toMap(
+        encodeThemeData: encodeThemeData,
+        encodeTokens: encodeTokens,
+      ),
+    );
+  }
+
   /// Imports controller state and preset definitions from a map.
   void fromMap(
     Map<String, Object?> map, {
@@ -260,6 +273,26 @@ class ThemeVariantsController<TTokens> extends ChangeNotifier {
       };
     }
 
+    _repairSelectedIdsAfterRegistryChange();
+    notifyListeners();
+  }
+
+  /// Imports only theme presets using [mode].
+  void importThemes(
+    Iterable<Map<String, Object?>> themes, {
+    required ThemeDataMapDecoder decodeThemeData,
+    required ThemeTokensMapDecoder<TTokens> decodeTokens,
+    ThemeImportMode mode = ThemeImportMode.replaceAndAdd,
+  }) {
+    _registry = _registry.importThemes(
+      themes,
+      decodeVariant: (variantMap) => ThemeVariant.fromMap<TTokens>(
+        variantMap,
+        decodeThemeData: decodeThemeData,
+        decodeTokens: decodeTokens,
+      ),
+      mode: mode,
+    );
     _repairSelectedIdsAfterRegistryChange();
     notifyListeners();
   }
