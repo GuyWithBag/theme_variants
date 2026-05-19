@@ -813,6 +813,118 @@ void main() {
       expect(resolved.border, Border.all(color: Colors.blue));
     });
 
+    test('surface constructor merges decoration and text style values', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.surface<TestTokens>(
+        base: (tokens) => SurfaceStyle(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(tokens.radius),
+          ),
+          textStyle: const TextStyle(fontSize: 14),
+        ),
+        variants: {
+          CardTone.highlighted: (tokens) => SurfaceStyle(
+            decoration: BoxDecoration(color: tokens.primary),
+            textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.decoration.color, Colors.blue);
+      expect(resolved.decoration.borderRadius, BorderRadius.circular(12));
+      expect(resolved.textStyle.fontSize, 14);
+      expect(resolved.textStyle.fontWeight, FontWeight.w700);
+    });
+
+    test('surface parts resolve decoration and text style fragments', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.surfaceParts<TestTokens>(
+        base: (tokens) => {
+          SurfaceStylePart.radius(tokens.radius),
+          SurfaceStylePart.fontSize(14),
+        },
+        variants: {
+          CardTone.highlighted: (tokens) => {
+            SurfaceStylePart.color(tokens.primary),
+            SurfaceStylePart.textColor(Colors.white),
+            SurfaceStylePart.fontWeight(FontWeight.w700),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.decoration.color, Colors.blue);
+      expect(resolved.decoration.borderRadius, BorderRadius.circular(12));
+      expect(resolved.textStyle.color, Colors.white);
+      expect(resolved.textStyle.fontSize, 14);
+      expect(resolved.textStyle.fontWeight, FontWeight.w700);
+    });
+
+    test('content constructor merges text and icon style values', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.content<TestTokens>(
+        base: (_) => const ContentStyle(
+          textStyle: TextStyle(fontSize: 14),
+          iconTheme: IconThemeData(size: 18),
+        ),
+        variants: {
+          ButtonTone.primary: (tokens) => ContentStyle(
+            textStyle: TextStyle(color: tokens.primary),
+            iconTheme: IconThemeData(color: tokens.primary),
+          ),
+          ButtonSize.lg: (_) => const ContentStyle(
+            textStyle: TextStyle(fontWeight: FontWeight.w700),
+            iconTheme: IconThemeData(size: 24),
+          ),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [
+        ButtonTone.primary,
+        ButtonSize.lg,
+      ]);
+
+      expect(resolved.textStyle.color, Colors.blue);
+      expect(resolved.textStyle.fontSize, 14);
+      expect(resolved.textStyle.fontWeight, FontWeight.w700);
+      expect(resolved.iconTheme.color, Colors.blue);
+      expect(resolved.iconTheme.size, 24);
+    });
+
+    test('content parts resolve text and icon style fragments', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.contentParts<TestTokens>(
+        base: (_) => {
+          ContentStylePart.fontSize(14),
+          ContentStylePart.iconSize(18),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            ContentStylePart.textColor(tokens.primary),
+            ContentStylePart.iconColor(tokens.primary),
+          },
+          ButtonSize.lg: (_) => {
+            ContentStylePart.fontWeight(FontWeight.w700),
+            ContentStylePart.iconSize(24),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [
+        ButtonTone.primary,
+        ButtonSize.lg,
+      ]);
+
+      expect(resolved.textStyle.color, Colors.blue);
+      expect(resolved.textStyle.fontSize, 14);
+      expect(resolved.textStyle.fontWeight, FontWeight.w700);
+      expect(resolved.iconTheme.color, Colors.blue);
+      expect(resolved.iconTheme.size, 24);
+    });
+
     test('button parts resolve ButtonStyle fragments', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.buttonParts<TestTokens>(

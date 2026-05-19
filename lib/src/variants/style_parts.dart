@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'content_style.dart';
+import 'surface_style.dart';
 import 'types.dart';
 
 class CompoundVariantParts<TTokens, TValue> {
@@ -315,5 +317,97 @@ class DecorationPart {
 
   static StylePart<BoxDecoration> shape(BoxShape shape) {
     return (decoration) => decoration.copyWith(shape: shape);
+  }
+}
+
+class SurfaceStylePart {
+  const SurfaceStylePart._();
+
+  static StylePart<SurfaceStyle> decoration(BoxDecoration decoration) {
+    return (style) => style.copyWith(decoration: decoration);
+  }
+
+  static StylePart<SurfaceStyle> textStyle(TextStyle textStyle) {
+    return (style) => style.copyWith(textStyle: textStyle);
+  }
+
+  static StylePart<SurfaceStyle> decorationPart(StylePart<BoxDecoration> part) {
+    return (style) => style.copyWith(decoration: part(style.decoration));
+  }
+
+  static StylePart<SurfaceStyle> textStylePart(StylePart<TextStyle> part) {
+    return (style) => style.copyWith(textStyle: part(style.textStyle));
+  }
+
+  static StylePart<SurfaceStyle> color(Color color) {
+    return decorationPart(DecorationPart.color(color));
+  }
+
+  static StylePart<SurfaceStyle> border(BoxBorder border) {
+    return decorationPart(DecorationPart.border(border));
+  }
+
+  static StylePart<SurfaceStyle> borderRadius(BorderRadiusGeometry radius) {
+    return decorationPart(DecorationPart.borderRadius(radius));
+  }
+
+  static StylePart<SurfaceStyle> radius(double radius) {
+    return decorationPart(DecorationPart.radius(radius));
+  }
+
+  static StylePart<SurfaceStyle> boxShadow(List<BoxShadow> boxShadow) {
+    return decorationPart(DecorationPart.boxShadow(boxShadow));
+  }
+
+  static StylePart<SurfaceStyle> textColor(Color color) {
+    return textStylePart(TextStylePart.color(color));
+  }
+
+  static StylePart<SurfaceStyle> fontSize(double fontSize) {
+    return textStylePart(TextStylePart.fontSize(fontSize));
+  }
+
+  static StylePart<SurfaceStyle> fontWeight(FontWeight fontWeight) {
+    return textStylePart(TextStylePart.fontWeight(fontWeight));
+  }
+}
+
+class ContentStylePart {
+  const ContentStylePart._();
+
+  static StylePart<ContentStyle> textStyle(TextStyle textStyle) {
+    return (style) => style.copyWith(textStyle: textStyle);
+  }
+
+  static StylePart<ContentStyle> iconTheme(IconThemeData iconTheme) {
+    return (style) => style.copyWith(iconTheme: iconTheme);
+  }
+
+  static StylePart<ContentStyle> textStylePart(StylePart<TextStyle> part) {
+    return (style) => style.copyWith(textStyle: part(style.textStyle));
+  }
+
+  static StylePart<ContentStyle> iconThemePart(StylePart<IconThemeData> part) {
+    return (style) => style.copyWith(iconTheme: part(style.iconTheme));
+  }
+
+  static StylePart<ContentStyle> textColor(Color color) {
+    return textStylePart(TextStylePart.color(color));
+  }
+
+  static StylePart<ContentStyle> fontSize(double fontSize) {
+    return textStylePart(TextStylePart.fontSize(fontSize));
+  }
+
+  static StylePart<ContentStyle> fontWeight(FontWeight fontWeight) {
+    return textStylePart(TextStylePart.fontWeight(fontWeight));
+  }
+
+  static StylePart<ContentStyle> iconColor(Color color) {
+    return iconThemePart(IconThemePart.color(color));
+  }
+
+  static StylePart<ContentStyle> iconSize(double size) {
+    return iconThemePart(IconThemePart.size(size));
   }
 }

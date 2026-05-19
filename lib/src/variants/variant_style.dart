@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'compound_variant.dart';
+import 'content_style.dart';
 import 'mergers.dart';
 import 'style_parts.dart';
+import 'surface_style.dart';
 import 'types.dart';
 import 'variant_style_factories.dart';
 
 export 'style_parts.dart';
+export 'content_style.dart';
+export 'surface_style.dart';
 export 'types.dart';
 
 /// A typed, CVA-like style resolver.
@@ -365,6 +369,66 @@ class VariantStyle<TTokens, TValue> {
   }) => createPartsVariantStyle(
     seed: const BoxDecoration(),
     merge: mergeBoxDecoration,
+    base: base,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
+  static VariantStyle<TTokens, SurfaceStyle> surface<TTokens>({
+    required ThemeVariantBuilder<TTokens, SurfaceStyle> base,
+    Map<Object, ThemeVariantBuilder<TTokens, SurfaceStyle>> variants = const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariant<TTokens, SurfaceStyle>> compoundVariants =
+        const [],
+  }) => createVariantStyle(
+    base: base,
+    merge: mergeSurfaceStyle,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
+  static VariantStyle<TTokens, SurfaceStyle> surfaceParts<TTokens>({
+    required ThemeVariantPartsBuilder<TTokens, SurfaceStyle> base,
+    Map<Object, ThemeVariantPartsBuilder<TTokens, SurfaceStyle>> variants =
+        const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariantParts<TTokens, SurfaceStyle>> compoundVariants =
+        const [],
+  }) => createPartsVariantStyle(
+    seed: const SurfaceStyle(),
+    merge: mergeSurfaceStyle,
+    base: base,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
+  static VariantStyle<TTokens, ContentStyle> content<TTokens>({
+    required ThemeVariantBuilder<TTokens, ContentStyle> base,
+    Map<Object, ThemeVariantBuilder<TTokens, ContentStyle>> variants = const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariant<TTokens, ContentStyle>> compoundVariants =
+        const [],
+  }) => createVariantStyle(
+    base: base,
+    merge: mergeContentStyle,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
+  static VariantStyle<TTokens, ContentStyle> contentParts<TTokens>({
+    required ThemeVariantPartsBuilder<TTokens, ContentStyle> base,
+    Map<Object, ThemeVariantPartsBuilder<TTokens, ContentStyle>> variants =
+        const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariantParts<TTokens, ContentStyle>> compoundVariants =
+        const [],
+  }) => createPartsVariantStyle(
+    seed: const ContentStyle(),
+    merge: mergeContentStyle,
     base: base,
     variants: variants,
     defaultVariants: defaultVariants,

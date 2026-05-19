@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'content_style.dart';
+import 'surface_style.dart';
+
 /// Convenience merger for [TextStyle].
 TextStyle mergeTextStyle(TextStyle base, TextStyle next) => base.merge(next);
 
@@ -155,5 +158,21 @@ BoxDecoration mergeBoxDecoration(BoxDecoration base, BoxDecoration next) {
     gradient: next.gradient,
     backgroundBlendMode: next.backgroundBlendMode,
     shape: next.shape,
+  );
+}
+
+/// Convenience merger for [SurfaceStyle].
+SurfaceStyle mergeSurfaceStyle(SurfaceStyle base, SurfaceStyle next) {
+  return SurfaceStyle(
+    decoration: mergeBoxDecoration(base.decoration, next.decoration),
+    textStyle: mergeTextStyle(base.textStyle, next.textStyle),
+  );
+}
+
+/// Convenience merger for [ContentStyle].
+ContentStyle mergeContentStyle(ContentStyle base, ContentStyle next) {
+  return ContentStyle(
+    textStyle: mergeTextStyle(base.textStyle, next.textStyle),
+    iconTheme: mergeIconThemeData(base.iconTheme, next.iconTheme),
   );
 }
