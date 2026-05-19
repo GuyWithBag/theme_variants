@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 
-/// A paired surface decoration and text style.
+import 'content_style.dart';
+
+/// A paired surface decoration and content style.
 ///
 /// Useful for cards, panels, labels, badges, and other components where
-/// container styling and text styling are usually selected together.
+/// container, text, and icon styling are usually selected together.
 class SurfaceStyle {
   const SurfaceStyle({
     this.decoration = const BoxDecoration(),
-    this.textStyle = const TextStyle(),
+    this.contentStyle = const ContentStyle(),
   });
 
   final BoxDecoration decoration;
-  final TextStyle textStyle;
+  final ContentStyle contentStyle;
 
-  SurfaceStyle copyWith({BoxDecoration? decoration, TextStyle? textStyle}) {
+  TextStyle get textStyle => contentStyle.textStyle;
+
+  IconThemeData get iconTheme => contentStyle.iconTheme;
+
+  SurfaceStyle copyWith({
+    BoxDecoration? decoration,
+    ContentStyle? contentStyle,
+  }) {
     return SurfaceStyle(
       decoration: decoration ?? this.decoration,
-      textStyle: textStyle ?? this.textStyle,
+      contentStyle: contentStyle ?? this.contentStyle,
     );
   }
 }

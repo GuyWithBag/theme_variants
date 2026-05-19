@@ -165,7 +165,7 @@ BoxDecoration mergeBoxDecoration(BoxDecoration base, BoxDecoration next) {
 SurfaceStyle mergeSurfaceStyle(SurfaceStyle base, SurfaceStyle next) {
   return SurfaceStyle(
     decoration: mergeBoxDecoration(base.decoration, next.decoration),
-    textStyle: mergeTextStyle(base.textStyle, next.textStyle),
+    contentStyle: mergeContentStyle(base.contentStyle, next.contentStyle),
   );
 }
 

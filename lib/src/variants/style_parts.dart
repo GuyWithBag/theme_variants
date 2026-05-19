@@ -323,52 +323,70 @@ class DecorationPart {
 class SurfaceStylePart {
   const SurfaceStylePart._();
 
-  static StylePart<SurfaceStyle> decoration(BoxDecoration decoration) {
-    return (style) => style.copyWith(decoration: decoration);
+  static StylePart<SurfaceStyle> decoration(
+    Iterable<StylePart<BoxDecoration>> parts,
+  ) {
+    return (style) => style.copyWith(
+      decoration: applyStyleParts<BoxDecoration>(style.decoration, parts),
+    );
   }
 
-  static StylePart<SurfaceStyle> textStyle(TextStyle textStyle) {
-    return (style) => style.copyWith(textStyle: textStyle);
+  static StylePart<SurfaceStyle> text(Iterable<StylePart<TextStyle>> parts) {
+    return content({ContentStylePart.text(parts)});
   }
 
-  static StylePart<SurfaceStyle> decorationPart(StylePart<BoxDecoration> part) {
-    return (style) => style.copyWith(decoration: part(style.decoration));
+  static StylePart<SurfaceStyle> icon(
+    Iterable<StylePart<IconThemeData>> parts,
+  ) {
+    return content({ContentStylePart.icon(parts)});
   }
 
-  static StylePart<SurfaceStyle> textStylePart(StylePart<TextStyle> part) {
-    return (style) => style.copyWith(textStyle: part(style.textStyle));
+  static StylePart<SurfaceStyle> content(
+    Iterable<StylePart<ContentStyle>> parts,
+  ) {
+    return (style) => style.copyWith(
+      contentStyle: applyStyleParts<ContentStyle>(style.contentStyle, parts),
+    );
   }
 
   static StylePart<SurfaceStyle> color(Color color) {
-    return decorationPart(DecorationPart.color(color));
+    return decoration({DecorationPart.color(color)});
   }
 
   static StylePart<SurfaceStyle> border(BoxBorder border) {
-    return decorationPart(DecorationPart.border(border));
+    return decoration({DecorationPart.border(border)});
   }
 
   static StylePart<SurfaceStyle> borderRadius(BorderRadiusGeometry radius) {
-    return decorationPart(DecorationPart.borderRadius(radius));
+    return decoration({DecorationPart.borderRadius(radius)});
   }
 
   static StylePart<SurfaceStyle> radius(double radius) {
-    return decorationPart(DecorationPart.radius(radius));
+    return decoration({DecorationPart.radius(radius)});
   }
 
   static StylePart<SurfaceStyle> boxShadow(List<BoxShadow> boxShadow) {
-    return decorationPart(DecorationPart.boxShadow(boxShadow));
+    return decoration({DecorationPart.boxShadow(boxShadow)});
   }
 
   static StylePart<SurfaceStyle> textColor(Color color) {
-    return textStylePart(TextStylePart.color(color));
+    return text({TextStylePart.color(color)});
   }
 
   static StylePart<SurfaceStyle> fontSize(double fontSize) {
-    return textStylePart(TextStylePart.fontSize(fontSize));
+    return text({TextStylePart.fontSize(fontSize)});
   }
 
   static StylePart<SurfaceStyle> fontWeight(FontWeight fontWeight) {
-    return textStylePart(TextStylePart.fontWeight(fontWeight));
+    return text({TextStylePart.fontWeight(fontWeight)});
+  }
+
+  static StylePart<SurfaceStyle> iconColor(Color color) {
+    return icon({IconThemePart.color(color)});
+  }
+
+  static StylePart<SurfaceStyle> iconSize(double size) {
+    return icon({IconThemePart.size(size)});
   }
 }
 
@@ -383,12 +401,26 @@ class ContentStylePart {
     return (style) => style.copyWith(iconTheme: iconTheme);
   }
 
+  static StylePart<ContentStyle> text(Iterable<StylePart<TextStyle>> parts) {
+    return (style) => style.copyWith(
+      textStyle: applyStyleParts<TextStyle>(style.textStyle, parts),
+    );
+  }
+
+  static StylePart<ContentStyle> icon(
+    Iterable<StylePart<IconThemeData>> parts,
+  ) {
+    return (style) => style.copyWith(
+      iconTheme: applyStyleParts<IconThemeData>(style.iconTheme, parts),
+    );
+  }
+
   static StylePart<ContentStyle> textStylePart(StylePart<TextStyle> part) {
-    return (style) => style.copyWith(textStyle: part(style.textStyle));
+    return text({part});
   }
 
   static StylePart<ContentStyle> iconThemePart(StylePart<IconThemeData> part) {
-    return (style) => style.copyWith(iconTheme: part(style.iconTheme));
+    return icon({part});
   }
 
   static StylePart<ContentStyle> textColor(Color color) {

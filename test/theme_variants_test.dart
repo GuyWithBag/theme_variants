@@ -820,12 +820,18 @@ void main() {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius),
           ),
-          textStyle: const TextStyle(fontSize: 14),
+          contentStyle: const ContentStyle(
+            textStyle: TextStyle(fontSize: 14),
+            iconTheme: IconThemeData(size: 18),
+          ),
         ),
         variants: {
           CardTone.highlighted: (tokens) => SurfaceStyle(
             decoration: BoxDecoration(color: tokens.primary),
-            textStyle: const TextStyle(fontWeight: FontWeight.w700),
+            contentStyle: ContentStyle(
+              textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              iconTheme: IconThemeData(color: tokens.primary),
+            ),
           ),
         },
       );
@@ -836,20 +842,35 @@ void main() {
       expect(resolved.decoration.borderRadius, BorderRadius.circular(12));
       expect(resolved.textStyle.fontSize, 14);
       expect(resolved.textStyle.fontWeight, FontWeight.w700);
+      expect(resolved.iconTheme.color, Colors.blue);
+      expect(resolved.iconTheme.size, 18);
     });
 
-    test('surface parts resolve decoration and text style fragments', () {
+    test('surface parts resolve decoration, text, and icon fragments', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.surfaceParts<TestTokens>(
         base: (tokens) => {
-          SurfaceStylePart.radius(tokens.radius),
-          SurfaceStylePart.fontSize(14),
+          SurfaceStylePart.decoration({
+            DecorationPart.radius(tokens.radius),
+            DecorationPart.color(Colors.white),
+          }),
+          SurfaceStylePart.text({TextStylePart.fontSize(14)}),
+          SurfaceStylePart.icon({IconThemePart.size(18)}),
         },
         variants: {
           CardTone.highlighted: (tokens) => {
-            SurfaceStylePart.color(tokens.primary),
-            SurfaceStylePart.textColor(Colors.white),
-            SurfaceStylePart.fontWeight(FontWeight.w700),
+            SurfaceStylePart.decoration({
+              DecorationPart.color(tokens.primary),
+              DecorationPart.border(Border.all(color: tokens.primary)),
+            }),
+            SurfaceStylePart.text({
+              TextStylePart.color(Colors.white),
+              TextStylePart.fontWeight(FontWeight.w700),
+            }),
+            SurfaceStylePart.icon({
+              IconThemePart.color(Colors.white),
+              IconThemePart.size(24),
+            }),
           },
         },
       );
@@ -858,9 +879,12 @@ void main() {
 
       expect(resolved.decoration.color, Colors.blue);
       expect(resolved.decoration.borderRadius, BorderRadius.circular(12));
+      expect(resolved.decoration.border, Border.all(color: Colors.blue));
       expect(resolved.textStyle.color, Colors.white);
       expect(resolved.textStyle.fontSize, 14);
       expect(resolved.textStyle.fontWeight, FontWeight.w700);
+      expect(resolved.iconTheme.color, Colors.white);
+      expect(resolved.iconTheme.size, 24);
     });
 
     test('content constructor merges text and icon style values', () {
