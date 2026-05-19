@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 /// CVA decides which style pieces apply; tokens provide the values those style
 /// pieces read from the active theme.
 typedef AppTokens = ({
-  String name,
   Color primary,
   Color onPrimary,
   Color danger,

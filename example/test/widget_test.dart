@@ -9,14 +9,14 @@ void main() {
     await tester.pumpWidget(const App());
 
     expect(find.text('Clean Light'), findsOneWidget);
-    expect(find.text('Active tokens: Clean Light'), findsOneWidget);
+    expect(find.text('Active theme: Clean Light'), findsOneWidget);
     expect(find.text('Primary large'), findsOneWidget);
     expect(find.text('Danger small'), findsOneWidget);
     expect(find.text('Danger large compound'), findsOneWidget);
     expect(find.text('Overridden flashcard'), findsOneWidget);
     expect(find.text('Inherited flashcard'), findsOneWidget);
-    expect(find.text('Card tokens: Forest Light'), findsOneWidget);
-    expect(find.text('Card tokens: Clean Light'), findsOneWidget);
+    expect(find.text('Card theme: Forest Light'), findsOneWidget);
+    expect(find.text('Card theme: Clean Light'), findsOneWidget);
   });
 
   testWidgets('can force the dark theme independently', (tester) async {
@@ -26,7 +26,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Forest Dark'), findsOneWidget);
-    expect(find.text('Active tokens: Forest Dark'), findsOneWidget);
+    expect(find.text('Active theme: Forest Dark'), findsOneWidget);
   });
 
   testWidgets('can switch the selected light theme', (tester) async {
@@ -38,6 +38,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Forest Light'), findsOneWidget);
-    expect(find.text('Active tokens: Forest Light'), findsOneWidget);
+    expect(find.text('Active theme: Forest Light'), findsOneWidget);
   });
 }

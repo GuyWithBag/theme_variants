@@ -4,7 +4,6 @@ import 'package:theme_variants/theme_variants.dart';
 import '../tokens/app_tokens.dart';
 
 const AppTokens cleanLightTokens = (
-  name: 'Clean Light',
   primary: Colors.blue,
   onPrimary: Colors.white,
   danger: Colors.red,
@@ -17,7 +16,6 @@ const AppTokens cleanLightTokens = (
 );
 
 const AppTokens cleanDarkTokens = (
-  name: 'Clean Dark',
   primary: Colors.indigo,
   onPrimary: Colors.white,
   danger: Colors.redAccent,
@@ -30,7 +28,6 @@ const AppTokens cleanDarkTokens = (
 );
 
 const AppTokens forestLightTokens = (
-  name: 'Forest Light',
   primary: Colors.green,
   onPrimary: Colors.white,
   danger: Colors.deepOrange,
@@ -43,7 +40,6 @@ const AppTokens forestLightTokens = (
 );
 
 const AppTokens forestDarkTokens = (
-  name: 'Forest Dark',
   primary: Colors.teal,
   onPrimary: Colors.black,
   danger: Colors.orangeAccent,
@@ -56,7 +52,6 @@ const AppTokens forestDarkTokens = (
 );
 
 const AppTokens monoTokens = (
-  name: 'Mono',
   primary: Colors.black,
   onPrimary: Colors.white,
   danger: Colors.black87,
@@ -73,6 +68,7 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
     'clean': LightDarkThemeVariant(
       light: ThemeVariant(
         id: 'clean-light',
+        name: 'Clean Light',
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.blue,
@@ -82,6 +78,7 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
       ),
       dark: ThemeVariant(
         id: 'clean-dark',
+        name: 'Clean Dark',
         themeData: ThemeData(
           brightness: Brightness.dark,
           colorSchemeSeed: Colors.indigo,
@@ -93,6 +90,7 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
     'forest': LightDarkThemeVariant(
       light: ThemeVariant(
         id: 'forest-light',
+        name: 'Forest Light',
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.green,
@@ -102,6 +100,7 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
       ),
       dark: ThemeVariant(
         id: 'forest-dark',
+        name: 'Forest Dark',
         themeData: ThemeData(
           brightness: Brightness.dark,
           colorSchemeSeed: Colors.teal,
@@ -113,6 +112,7 @@ final appThemeRegistry = ThemeVariantRegistry<AppTokens>(
     'mono': SingleThemeVariant(
       ThemeVariant(
         id: 'mono',
+        name: 'Mono',
         themeData: ThemeData(
           brightness: Brightness.light,
           colorSchemeSeed: Colors.black,

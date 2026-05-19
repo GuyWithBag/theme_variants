@@ -11,27 +11,18 @@ enum CardTone { neutral, highlighted }
 enum ButtonDensity { compact }
 
 class TestTokens {
-  const TestTokens({
-    required this.name,
-    required this.radius,
-    required this.primary,
-  });
+  const TestTokens({required this.radius, required this.primary});
 
-  final String name;
   final double radius;
   final Color primary;
 }
 
-ThemeVariant<TestTokens> theme(
-  String id,
-  Brightness brightness,
-  String tokenName,
-) {
+ThemeVariant<TestTokens> theme(String id, Brightness brightness, String name) {
   return ThemeVariant<TestTokens>(
     id: id,
+    name: name,
     themeData: ThemeData(brightness: brightness),
     tokens: TestTokens(
-      name: tokenName,
       radius: brightness == Brightness.dark ? 16 : 8,
       primary: brightness == Brightness.dark ? Colors.indigo : Colors.blue,
     ),
@@ -50,17 +41,11 @@ void main() {
       );
 
       expect(
-        registry
-            .resolve(id: 'minimal', brightness: Brightness.light)
-            .tokens
-            .name,
+        registry.resolve(id: 'minimal', brightness: Brightness.light).name,
         'minimal',
       );
       expect(
-        registry
-            .resolve(id: 'minimal', brightness: Brightness.dark)
-            .tokens
-            .name,
+        registry.resolve(id: 'minimal', brightness: Brightness.dark).name,
         'minimal',
       );
     });
@@ -76,11 +61,11 @@ void main() {
       );
 
       expect(
-        registry.resolve(id: 'brand', brightness: Brightness.light).tokens.name,
+        registry.resolve(id: 'brand', brightness: Brightness.light).name,
         'brand light',
       );
       expect(
-        registry.resolve(id: 'brand', brightness: Brightness.dark).tokens.name,
+        registry.resolve(id: 'brand', brightness: Brightness.dark).name,
         'brand dark',
       );
     });
@@ -139,8 +124,8 @@ void main() {
         darkThemeId: 'midnight',
       );
 
-      expect(controller.lightTheme().tokens.name, 'clean light');
-      expect(controller.darkTheme().tokens.name, 'midnight');
+      expect(controller.lightTheme().name, 'clean light');
+      expect(controller.darkTheme().name, 'midnight');
     });
 
     test('resolves active theme from ThemeMode', () {
@@ -161,14 +146,11 @@ void main() {
         darkThemeId: 'midnight',
       );
 
-      expect(controller.activeTheme(Brightness.dark).tokens.name, 'midnight');
+      expect(controller.activeTheme(Brightness.dark).name, 'midnight');
 
       controller.setThemeMode(ThemeMode.light);
 
-      expect(
-        controller.activeTheme(Brightness.dark).tokens.name,
-        'clean light',
-      );
+      expect(controller.activeTheme(Brightness.dark).name, 'clean light');
     });
 
     test('applies theme transforms to resolved themes', () {
@@ -186,21 +168,18 @@ void main() {
         transform: (theme) {
           return ThemeVariant<TestTokens>(
             id: theme.id,
+            name: '${theme.name} customized',
             themeData: theme.themeData.copyWith(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
             ),
-            tokens: TestTokens(
-              name: '${theme.tokens.name} customized',
-              radius: 24,
-              primary: Colors.purple,
-            ),
+            tokens: TestTokens(radius: 24, primary: Colors.purple),
           );
         },
       );
 
       final resolved = controller.lightTheme();
 
-      expect(resolved.tokens.name, 'clean customized');
+      expect(resolved.name, 'clean customized');
       expect(resolved.tokens.radius, 24);
       expect(resolved.tokens.primary, Colors.purple);
     });
@@ -226,12 +205,9 @@ void main() {
           controller: controller,
           child: Builder(
             builder: (context) {
-              final tokens = ThemeVariantsProvider.tokensOf<TestTokens>(
-                context,
-              );
               return Directionality(
                 textDirection: TextDirection.ltr,
-                child: Text(tokens.name),
+                child: Text(context.activeThemeVariant<TestTokens>().name),
               );
             },
           ),
@@ -262,10 +238,9 @@ void main() {
           controller: controller,
           child: Builder(
             builder: (context) {
-              final tokens = context.themeTokens<TestTokens>();
               return Directionality(
                 textDirection: TextDirection.ltr,
-                child: Text(tokens.name),
+                child: Text(context.activeThemeVariant<TestTokens>().name),
               );
             },
           ),
@@ -300,10 +275,9 @@ void main() {
             darkThemeId: 'card',
             child: Builder(
               builder: (context) {
-                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(tokens.name),
+                  child: Text(context.activeThemeVariant<TestTokens>().name),
                 );
               },
             ),
@@ -338,10 +312,9 @@ void main() {
             darkThemeId: 'card',
             child: Builder(
               builder: (context) {
-                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(tokens.name),
+                  child: Text(context.activeThemeVariant<TestTokens>().name),
                 );
               },
             ),
@@ -383,10 +356,9 @@ void main() {
               themeMode: ThemeMode.light,
               child: Builder(
                 builder: (context) {
-                  final tokens = context.themeTokens<TestTokens>();
                   return Directionality(
                     textDirection: TextDirection.ltr,
-                    child: Text(tokens.name),
+                    child: Text(context.activeThemeVariant<TestTokens>().name),
                   );
                 },
               ),
@@ -414,9 +386,9 @@ void main() {
         transform: (theme) {
           return ThemeVariant<TestTokens>(
             id: theme.id,
+            name: '${theme.name} transformed',
             themeData: theme.themeData,
             tokens: TestTokens(
-              name: '${theme.tokens.name} transformed',
               radius: theme.tokens.radius,
               primary: theme.tokens.primary,
             ),
@@ -432,10 +404,9 @@ void main() {
             darkThemeId: 'card',
             child: Builder(
               builder: (context) {
-                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(tokens.name),
+                  child: Text(context.activeThemeVariant<TestTokens>().name),
                 );
               },
             ),
@@ -472,10 +443,9 @@ void main() {
           child: ThemeVariantsOverride<TestTokens>(
             child: Builder(
               builder: (context) {
-                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(tokens.name),
+                  child: Text(context.activeThemeVariant<TestTokens>().name),
                 );
               },
             ),
@@ -515,10 +485,9 @@ void main() {
             darkThemeId: 'card',
             child: Builder(
               builder: (context) {
-                final tokens = context.themeTokens<TestTokens>();
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: Text(tokens.name),
+                  child: Text(context.activeThemeVariant<TestTokens>().name),
                 );
               },
             ),
@@ -539,7 +508,7 @@ void main() {
 
   group('VariantStyle', () {
     test('resolves typed variants and defaults', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle<TestTokens, TextStyle>(
         base: (_) => const TextStyle(fontSize: 14),
         merge: mergeTextStyle,
@@ -560,7 +529,7 @@ void main() {
     });
 
     test('explicit variants replace defaults from the same type', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle<TestTokens, TextStyle>(
         base: (_) => const TextStyle(),
         merge: mergeTextStyle,
@@ -584,7 +553,7 @@ void main() {
     });
 
     test('throws when a selected variant is not registered', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.text<TestTokens>(
         base: (_) => const TextStyle(),
         variants: {ButtonSize.md: (_) => const TextStyle(fontSize: 14)},
@@ -597,7 +566,7 @@ void main() {
     });
 
     test('throws when a default variant is not registered', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.text<TestTokens>(
         base: (_) => const TextStyle(),
         defaultVariants: const [ButtonSize.md],
@@ -608,7 +577,7 @@ void main() {
     });
 
     test('throws when defaults contain duplicate variant types', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.text<TestTokens>(
         base: (_) => const TextStyle(),
         defaultVariants: const [ButtonSize.sm, ButtonSize.md],
@@ -622,7 +591,7 @@ void main() {
     });
 
     test('throws when selected variants contain duplicate variant types', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.text<TestTokens>(
         base: (_) => const TextStyle(),
         variants: {
@@ -640,11 +609,7 @@ void main() {
     test(
       'throws when a compound variant references an unregistered variant',
       () {
-        const tokens = TestTokens(
-          name: 'test',
-          radius: 12,
-          primary: Colors.blue,
-        );
+        const tokens = TestTokens(radius: 12, primary: Colors.blue);
         final style = VariantStyle.text<TestTokens>(
           base: (_) => const TextStyle(),
           variants: {ButtonSize.lg: (_) => const TextStyle(fontSize: 18)},
@@ -661,7 +626,7 @@ void main() {
     );
 
     test('button style variants override earlier button style values', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.button<TestTokens>(
         base: (_) => const ButtonStyle(),
         defaultVariants: const [ButtonTone.primary],
@@ -681,7 +646,7 @@ void main() {
     });
 
     test('text style constructor uses the text style merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.text<TestTokens>(
         base: (_) => const TextStyle(fontSize: 14),
         defaultVariants: const [ButtonTone.primary],
@@ -697,7 +662,7 @@ void main() {
     });
 
     test('text theme constructor uses the text theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.textTheme<TestTokens>(
         base: (_) => const TextTheme(titleMedium: TextStyle(fontSize: 18)),
         variants: {
@@ -713,7 +678,7 @@ void main() {
     });
 
     test('icon constructor uses the icon theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.icon<TestTokens>(
         base: (_) => const IconThemeData(size: 20),
         variants: {
@@ -728,7 +693,7 @@ void main() {
     });
 
     test('decoration constructor uses the box decoration merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.decoration<TestTokens>(
         base: (tokens) =>
             BoxDecoration(borderRadius: BorderRadius.circular(tokens.radius)),
@@ -747,7 +712,7 @@ void main() {
     });
 
     test('input decoration constructor uses the input theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.inputDecoration<TestTokens>(
         base: (_) =>
             const InputDecorationThemeData(contentPadding: EdgeInsets.all(12)),
@@ -764,7 +729,7 @@ void main() {
     });
 
     test('list tile constructor uses the list tile theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.listTile<TestTokens>(
         base: (_) =>
             const ListTileThemeData(contentPadding: EdgeInsets.all(12)),
@@ -781,7 +746,7 @@ void main() {
     });
 
     test('card constructor uses the card theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.card<TestTokens>(
         base: (_) => const CardThemeData(margin: EdgeInsets.all(12)),
         variants: {
@@ -796,7 +761,7 @@ void main() {
     });
 
     test('chip constructor uses the chip theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.chip<TestTokens>(
         base: (_) => const ChipThemeData(padding: EdgeInsets.all(12)),
         variants: {
@@ -812,7 +777,7 @@ void main() {
     });
 
     test('navigation bar constructor uses the navigation theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.navigationBar<TestTokens>(
         base: (_) => const NavigationBarThemeData(height: 72),
         variants: {
@@ -828,7 +793,7 @@ void main() {
     });
 
     test('tab bar constructor uses the tab bar theme merger', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.tabBar<TestTokens>(
         base: (_) => const TabBarThemeData(labelPadding: EdgeInsets.all(12)),
         variants: {
@@ -844,7 +809,7 @@ void main() {
     });
 
     test('applies compound variants when all required variants match', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle<TestTokens, TextStyle>(
         base: (_) => const TextStyle(fontSize: 14),
         merge: mergeTextStyle,
@@ -871,7 +836,7 @@ void main() {
     });
 
     test('decoration parts resolve set-like style fragments', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.decorationParts<TestTokens>(
         base: (tokens) => {
           DecorationPart.radius(tokens.radius),
@@ -895,7 +860,7 @@ void main() {
     });
 
     test('button parts resolve ButtonStyle fragments', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.buttonParts<TestTokens>(
         base: (tokens) => {
           ButtonStylePart.shape(
@@ -919,7 +884,7 @@ void main() {
     });
 
     test('parts constructors resolve supported Flutter style types', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
 
       final text = VariantStyle.textParts<TestTokens>(
         base: (_) => {
@@ -1020,7 +985,7 @@ void main() {
     });
 
     test('parts compound variants use set-like style fragments', () {
-      const tokens = TestTokens(name: 'test', radius: 12, primary: Colors.blue);
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.textParts<TestTokens>(
         base: (_) => {TextStylePart.fontSize(14)},
         variants: {

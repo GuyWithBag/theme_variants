@@ -11,15 +11,16 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.themeVariantsController<AppTokens>();
     final tokens = context.themeTokens<AppTokens>();
+    final activeTheme = context.activeThemeVariant<AppTokens>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(tokens.name)),
+      appBar: AppBar(title: Text(activeTheme.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Active tokens: ${tokens.name}'),
+            Text('Active theme: ${activeTheme.name}'),
             Text(
               'radius ${tokens.radius.toStringAsFixed(0)} / spacing ${tokens.spaceSm.toStringAsFixed(0)}-${tokens.spaceLg.toStringAsFixed(0)}',
             ),
@@ -137,6 +138,7 @@ class _FlashcardSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.themeTokens<AppTokens>();
+    final activeTheme = context.activeThemeVariant<AppTokens>();
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -153,7 +155,7 @@ class _FlashcardSurface extends StatelessWidget {
             const SizedBox(height: 4),
             Text(subtitle),
             const SizedBox(height: 12),
-            Text('Card tokens: ${tokens.name}'),
+            Text('Card theme: ${activeTheme.name}'),
             const SizedBox(height: 12),
             FilledButton(
               style: buttonStyle.resolve(tokens),

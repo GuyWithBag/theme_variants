@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class ThemeVariant<TTokens> {
   const ThemeVariant({
     required this.id,
+    required this.name,
     required this.themeData,
     required this.tokens,
   });
 
   final String id;
+  final String name;
   final ThemeData themeData;
   final TTokens tokens;
 }
