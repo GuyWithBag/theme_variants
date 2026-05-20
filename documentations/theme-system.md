@@ -206,3 +206,26 @@ If an id is omitted, it follows the parent controller.
 
 If `enabled` is false, it returns `child` directly and inherits the nearest
 parent provider.
+
+## Composed Tokens
+
+When light and dark themes should share layout/size values but differ in
+mode-specific values, use `LightDarkThemePreset.composed`.
+
+```dart
+final preset = LightDarkThemePreset.composed<AppTokens, SharedTokens, ModeTokens>(
+  id: 'brand',
+  name: 'Brand',
+  sharedTokens: shared,
+  lightTokens: lightMode,
+  darkTokens: darkMode,
+  composeTokens: (shared, mode) => AppTokens.compose(shared, mode),
+  buildThemeData: (tokens, brightness) => ThemeData(
+    brightness: brightness,
+    colorSchemeSeed: tokens.primary,
+  ),
+);
+```
+
+`composeTokens` is where you define merge precedence between shared and
+mode-specific values.

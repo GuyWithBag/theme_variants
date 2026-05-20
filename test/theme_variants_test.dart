@@ -17,6 +17,18 @@ class TestTokens {
   final Color primary;
 }
 
+class SharedTokens {
+  const SharedTokens({required this.radius});
+
+  final double radius;
+}
+
+class ModeTokens {
+  const ModeTokens({required this.primary});
+
+  final Color primary;
+}
+
 ThemeVariant<TestTokens> theme(
   String themePresetId,
   ThemeVariantBrightness brightness,
@@ -120,6 +132,36 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('composed light/dark presets keep shared tokens stable', () {
+      final composed =
+          LightDarkThemePreset.composed<TestTokens, SharedTokens, ModeTokens>(
+            id: 'composed',
+            name: 'Composed',
+            sharedTokens: const SharedTokens(radius: 20),
+            lightTokens: const ModeTokens(primary: Colors.blue),
+            darkTokens: const ModeTokens(primary: Colors.indigo),
+            composeTokens: (shared, mode) {
+              return TestTokens(radius: shared.radius, primary: mode.primary);
+            },
+            buildThemeData: (tokens, brightness) {
+              return ThemeData(
+                brightness: brightness,
+                colorSchemeSeed: tokens.primary,
+              );
+            },
+          );
+
+      final light = composed.resolve(Brightness.light);
+      final dark = composed.resolve(Brightness.dark);
+
+      expect(light.tokens.radius, 20);
+      expect(dark.tokens.radius, 20);
+      expect(light.tokens.primary, Colors.blue);
+      expect(dark.tokens.primary, Colors.indigo);
+      expect(light.brightness, ThemeVariantBrightness.light);
+      expect(dark.brightness, ThemeVariantBrightness.dark);
     });
   });
 

@@ -13,6 +13,14 @@ typedef ThemeVariantMapEncoder<TTokens> =
 typedef ThemeVariantMapDecoder<TTokens> =
     ThemeVariant<TTokens> Function(Map<String, Object?> map);
 
+/// Builds concrete tokens from shared and mode-specific token values.
+typedef ThemeTokensComposer<TTokens, TSharedTokens, TModeTokens> =
+    TTokens Function(TSharedTokens shared, TModeTokens mode);
+
+/// Builds [ThemeData] for a resolved token set and target brightness.
+typedef ThemeDataForTokensBuilder<TTokens> =
+    ThemeData Function(TTokens tokens, Brightness brightness);
+
 /// A named theme preset that can resolve to a concrete [ThemeVariant].
 abstract class ThemePreset<TTokens> {
   const ThemePreset();
@@ -123,6 +131,39 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
     required this.light,
     required this.dark,
   });
+
+  /// Creates a preset by composing shared and mode-specific token sets.
+  static LightDarkThemePreset<TTokens>
+  composed<TTokens, TSharedTokens, TModeTokens>({
+    required String id,
+    required String name,
+    required TSharedTokens sharedTokens,
+    required TModeTokens lightTokens,
+    required TModeTokens darkTokens,
+    required ThemeTokensComposer<TTokens, TSharedTokens, TModeTokens>
+    composeTokens,
+    required ThemeDataForTokensBuilder<TTokens> buildThemeData,
+  }) {
+    final resolvedLightTokens = composeTokens(sharedTokens, lightTokens);
+    final resolvedDarkTokens = composeTokens(sharedTokens, darkTokens);
+
+    return LightDarkThemePreset<TTokens>(
+      id: id,
+      name: name,
+      light: ThemeVariant<TTokens>(
+        themePresetId: id,
+        brightness: ThemeVariantBrightness.light,
+        themeData: buildThemeData(resolvedLightTokens, Brightness.light),
+        tokens: resolvedLightTokens,
+      ),
+      dark: ThemeVariant<TTokens>(
+        themePresetId: id,
+        brightness: ThemeVariantBrightness.dark,
+        themeData: buildThemeData(resolvedDarkTokens, Brightness.dark),
+        tokens: resolvedDarkTokens,
+      ),
+    );
+  }
 
   @override
   final String id;

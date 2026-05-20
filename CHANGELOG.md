@@ -1,3 +1,13 @@
+## 0.1.1
+
+* Added `LightDarkThemePreset.composed` for building light/dark preset pairs
+  from shared and mode-specific token inputs.
+* Added `ThemeTokensComposer` and `ThemeDataForTokensBuilder` typedefs to
+  support reusable token merge and `ThemeData` construction flows.
+* Added tests validating composed presets keep shared token values stable while
+  allowing mode-specific overrides.
+* Updated theme system docs with composed token usage examples.
+
 ## 0.1.0
 
 * Breaking: replaced theme entries with preset-based theme models. Use
