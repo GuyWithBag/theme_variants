@@ -65,8 +65,8 @@ abstract class ThemePreset<TTokens> {
       'light_dark' => LightDarkThemePreset<TTokens>(
         id: rawId,
         name: rawName,
-        lightTokens: decodeVariant(_asMap(map['light'], 'light')),
-        darkTokens: decodeVariant(_asMap(map['dark'], 'dark')),
+        light: decodeVariant(_asMap(map['light'], 'light')),
+        dark: decodeVariant(_asMap(map['dark'], 'dark')),
       ),
       _ => throw ArgumentError.value(
         rawType,
@@ -120,8 +120,8 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
   const LightDarkThemePreset({
     required this.id,
     required this.name,
-    required this.lightTokens,
-    required this.darkTokens,
+    required this.light,
+    required this.dark,
   });
 
   @override
@@ -134,14 +134,14 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
   ThemePresetType get presetType => ThemePresetType.lightDark;
 
   /// Variant used when resolving [Brightness.light].
-  final ThemeVariant<TTokens> lightTokens;
+  final ThemeVariant<TTokens> light;
 
   /// Variant used when resolving [Brightness.dark].
-  final ThemeVariant<TTokens> darkTokens;
+  final ThemeVariant<TTokens> dark;
 
   @override
   ThemeVariant<TTokens> resolve(Brightness brightness) {
-    return brightness == Brightness.dark ? darkTokens : lightTokens;
+    return brightness == Brightness.dark ? dark : light;
   }
 
   @override
@@ -152,8 +152,8 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
       'id': id,
       'name': name,
       'preset_type': 'light_dark',
-      'lightTokens': encodeVariant(lightTokens),
-      'darkTokens': encodeVariant(darkTokens),
+      'light': encodeVariant(light),
+      'dark': encodeVariant(dark),
     };
   }
 }

@@ -48,8 +48,8 @@ LightDarkThemePreset<TestTokens> lightDarkPreset(String id, String name) {
   return LightDarkThemePreset<TestTokens>(
     id: id,
     name: name,
-    lightTokens: theme(id, ThemeVariantBrightness.light),
-    darkTokens: theme(id, ThemeVariantBrightness.dark),
+    light: theme(id, ThemeVariantBrightness.light),
+    dark: theme(id, ThemeVariantBrightness.dark),
   );
 }
 
