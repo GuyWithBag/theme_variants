@@ -14,8 +14,8 @@ typedef ThemeVariantMapDecoder<TTokens> =
     ThemeVariant<TTokens> Function(Map<String, Object?> map);
 
 /// Builds concrete tokens from shared and mode-specific token values.
-typedef ThemeTokensComposer<TTokens, TSharedTokens, TModeTokens> =
-    TTokens Function(TSharedTokens shared, TModeTokens mode);
+typedef ThemeTokensComposer<TTokens, TSharedTokens> =
+    TTokens Function(TTokens tokens, TSharedTokens shared);
 
 /// Builds [ThemeData] for a resolved token set and target brightness.
 typedef ThemeDataForTokensBuilder<TTokens> =
@@ -73,8 +73,8 @@ abstract class ThemePreset<TTokens> {
       'light_dark' => LightDarkThemePreset<TTokens>(
         id: rawId,
         name: rawName,
-        light: decodeVariant(_asMap(map['light'], 'light')),
-        dark: decodeVariant(_asMap(map['dark'], 'dark')),
+        lightTokens: decodeVariant(_asMap(map['light'], 'light')),
+        darkTokens: decodeVariant(_asMap(map['dark'], 'dark')),
       ),
       _ => throw ArgumentError.value(
         rawType,
@@ -128,35 +128,33 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
   const LightDarkThemePreset({
     required this.id,
     required this.name,
-    required this.light,
-    required this.dark,
+    required this.lightTokens,
+    required this.darkTokens,
   });
 
   /// Creates a preset by composing shared and mode-specific token sets.
-  static LightDarkThemePreset<TTokens>
-  composed<TTokens, TSharedTokens, TModeTokens>({
+  static LightDarkThemePreset<TTokens> composed<TTokens, TSharedTokens>({
     required String id,
     required String name,
     required TSharedTokens sharedTokens,
-    required TModeTokens lightTokens,
-    required TModeTokens darkTokens,
-    required ThemeTokensComposer<TTokens, TSharedTokens, TModeTokens>
-    composeTokens,
+    required TTokens lightTokens,
+    required TTokens darkTokens,
+    required ThemeTokensComposer<TTokens, TSharedTokens> composeTokens,
     required ThemeDataForTokensBuilder<TTokens> buildThemeData,
   }) {
-    final resolvedLightTokens = composeTokens(sharedTokens, lightTokens);
-    final resolvedDarkTokens = composeTokens(sharedTokens, darkTokens);
+    final resolvedLightTokens = composeTokens(lightTokens, sharedTokens);
+    final resolvedDarkTokens = composeTokens(darkTokens, sharedTokens);
 
     return LightDarkThemePreset<TTokens>(
       id: id,
       name: name,
-      light: ThemeVariant<TTokens>(
+      lightTokens: ThemeVariant<TTokens>(
         themePresetId: id,
         brightness: ThemeVariantBrightness.light,
         themeData: buildThemeData(resolvedLightTokens, Brightness.light),
         tokens: resolvedLightTokens,
       ),
-      dark: ThemeVariant<TTokens>(
+      darkTokens: ThemeVariant<TTokens>(
         themePresetId: id,
         brightness: ThemeVariantBrightness.dark,
         themeData: buildThemeData(resolvedDarkTokens, Brightness.dark),
@@ -175,14 +173,14 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
   ThemePresetType get presetType => ThemePresetType.lightDark;
 
   /// Variant used when resolving [Brightness.light].
-  final ThemeVariant<TTokens> light;
+  final ThemeVariant<TTokens> lightTokens;
 
   /// Variant used when resolving [Brightness.dark].
-  final ThemeVariant<TTokens> dark;
+  final ThemeVariant<TTokens> darkTokens;
 
   @override
   ThemeVariant<TTokens> resolve(Brightness brightness) {
-    return brightness == Brightness.dark ? dark : light;
+    return brightness == Brightness.dark ? darkTokens : lightTokens;
   }
 
   @override
@@ -193,8 +191,8 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
       'id': id,
       'name': name,
       'preset_type': 'light_dark',
-      'light': encodeVariant(light),
-      'dark': encodeVariant(dark),
+      'lightTokens': encodeVariant(lightTokens),
+      'darkTokens': encodeVariant(darkTokens),
     };
   }
 }
