@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'content_style.dart';
-import 'surface_style.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// Convenience merger for [TextStyle].
 TextStyle mergeTextStyle(TextStyle base, TextStyle next) => base.merge(next);

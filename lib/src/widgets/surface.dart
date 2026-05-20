@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../variants/surface_style.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// Applies a [SurfaceStyle] to a widget subtree.
 ///

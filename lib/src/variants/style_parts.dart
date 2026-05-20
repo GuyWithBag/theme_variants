@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'content_style.dart';
-import 'surface_style.dart';
-import 'types.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 class CompoundVariantParts<TTokens, TValue> {
   const CompoundVariantParts({required this.when, required this.build});

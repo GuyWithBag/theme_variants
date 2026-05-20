@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-
-import 'compound_variant.dart';
-import 'content_style.dart';
-import 'mergers.dart';
-import 'style_parts.dart';
-import 'surface_style.dart';
-import 'types.dart';
 import 'variant_style_factories.dart';
 
 export 'style_parts.dart';
-export 'content_style.dart';
-export 'surface_style.dart';
+import 'package:theme_variants/theme_variants.dart';
+
 export 'types.dart';
 
 /// A typed, CVA-like style resolver.
