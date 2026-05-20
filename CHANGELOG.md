@@ -1,3 +1,10 @@
+## 0.1.2
+
+  * renamed light and dark to lightTokens and
+  darkTokens
+  * removed TModeTokens and use only
+  TTokens
+
 ## 0.1.1
 
 * Added `LightDarkThemePreset.composed` for building light/dark preset pairs
