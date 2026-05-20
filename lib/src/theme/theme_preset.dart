@@ -13,14 +13,6 @@ typedef ThemeVariantMapEncoder<TTokens> =
 typedef ThemeVariantMapDecoder<TTokens> =
     ThemeVariant<TTokens> Function(Map<String, Object?> map);
 
-/// Builds concrete tokens from shared and mode-specific token values.
-typedef ThemeTokensComposer<TTokens, TSharedTokens> =
-    TTokens Function(TTokens tokens, TSharedTokens shared);
-
-/// Builds [ThemeData] for a resolved token set and target brightness.
-typedef ThemeDataForTokensBuilder<TTokens> =
-    ThemeData Function(TTokens tokens, Brightness brightness);
-
 /// A named theme preset that can resolve to a concrete [ThemeVariant].
 abstract class ThemePreset<TTokens> {
   const ThemePreset();
@@ -131,37 +123,6 @@ class LightDarkThemePreset<TTokens> extends ThemePreset<TTokens> {
     required this.lightTokens,
     required this.darkTokens,
   });
-
-  /// Creates a preset by composing shared and mode-specific token sets.
-  static LightDarkThemePreset<TTokens> composed<TTokens, TSharedTokens>({
-    required String id,
-    required String name,
-    required TSharedTokens sharedTokens,
-    required TTokens lightTokens,
-    required TTokens darkTokens,
-    required ThemeTokensComposer<TTokens, TSharedTokens> composeTokens,
-    required ThemeDataForTokensBuilder<TTokens> buildThemeData,
-  }) {
-    final resolvedLightTokens = composeTokens(lightTokens, sharedTokens);
-    final resolvedDarkTokens = composeTokens(darkTokens, sharedTokens);
-
-    return LightDarkThemePreset<TTokens>(
-      id: id,
-      name: name,
-      lightTokens: ThemeVariant<TTokens>(
-        themePresetId: id,
-        brightness: ThemeVariantBrightness.light,
-        themeData: buildThemeData(resolvedLightTokens, Brightness.light),
-        tokens: resolvedLightTokens,
-      ),
-      darkTokens: ThemeVariant<TTokens>(
-        themePresetId: id,
-        brightness: ThemeVariantBrightness.dark,
-        themeData: buildThemeData(resolvedDarkTokens, Brightness.dark),
-        tokens: resolvedDarkTokens,
-      ),
-    );
-  }
 
   @override
   final String id;
