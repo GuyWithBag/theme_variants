@@ -161,7 +161,7 @@ BoxDecoration mergeBoxDecoration(BoxDecoration base, BoxDecoration next) {
 
 /// Convenience merger for [SurfaceStyle].
 SurfaceStyle mergeSurfaceStyle(SurfaceStyle base, SurfaceStyle next) {
-  return SurfaceStyle(
+  return base.copyWith(
     decoration: mergeBoxDecoration(base.decoration, next.decoration),
     foregroundDecoration: switch ((
       base.foregroundDecoration,
@@ -191,7 +191,7 @@ SurfaceStyle mergeSurfaceStyle(SurfaceStyle base, SurfaceStyle next) {
 
 /// Convenience merger for [ContentStyle].
 ContentStyle mergeContentStyle(ContentStyle base, ContentStyle next) {
-  return ContentStyle(
+  return base.copyWith(
     textStyle: mergeTextStyle(base.textStyle, next.textStyle),
     iconTheme: mergeIconThemeData(base.iconTheme, next.iconTheme),
     textAlign: next.textAlign ?? base.textAlign,
@@ -200,5 +200,18 @@ ContentStyle mergeContentStyle(ContentStyle base, ContentStyle next) {
     maxLines: next.maxLines ?? base.maxLines,
     textWidthBasis: next.textWidthBasis ?? base.textWidthBasis,
     textHeightBehavior: next.textHeightBehavior ?? base.textHeightBehavior,
+  );
+}
+
+/// Convenience merger for [TextFieldStyle].
+TextFieldStyle mergeTextFieldStyle(TextFieldStyle base, TextFieldStyle next) {
+  return base.copyWith(
+    textStyle: mergeTextStyle(base.textStyle, next.textStyle),
+    decorationTheme: mergeInputDecorationThemeData(
+      base.decorationTheme,
+      next.decorationTheme,
+    ),
+    textAlign: next.textAlign ?? base.textAlign,
+    cursorColor: next.cursorColor ?? base.cursorColor,
   );
 }

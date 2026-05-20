@@ -692,6 +692,40 @@ void main() {
       expect(resolved.fillColor, Colors.blue);
     });
 
+    test('text field constructor merges text and decoration styles', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.textField<TestTokens>(
+        base: (_) => const TextFieldStyle(
+          textStyle: TextStyle(fontSize: 14),
+          decorationTheme: InputDecorationThemeData(
+            contentPadding: EdgeInsets.all(12),
+          ),
+        ),
+        variants: {
+          ButtonTone.primary: (tokens) => TextFieldStyle(
+            textStyle: TextStyle(color: tokens.primary),
+            decorationTheme: InputDecorationThemeData(
+              fillColor: tokens.primary,
+            ),
+            textAlign: TextAlign.center,
+            cursorColor: tokens.primary,
+          ),
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+
+      expect(resolved.textStyle.fontSize, 14);
+      expect(resolved.textStyle.color, Colors.blue);
+      expect(resolved.decorationTheme.contentPadding, const EdgeInsets.all(12));
+      expect(resolved.decorationTheme.fillColor, Colors.blue);
+      expect(resolved.textAlign, TextAlign.center);
+      expect(resolved.cursorColor, Colors.blue);
+
+      const defaultStyle = TextFieldStyle();
+      expect(defaultStyle.textAlign, isNull);
+    });
+
     test('list tile constructor uses the list tile theme merger', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.listTile<TestTokens>(
@@ -1060,6 +1094,21 @@ void main() {
       expect(resolved.textAlign, TextAlign.center);
       expect(resolved.overflow, TextOverflow.ellipsis);
       expect(resolved.maxLines, 1);
+
+      const defaultContent = ContentStyle();
+      expect(defaultContent.textAlign, isNull);
+      expect(defaultContent.softWrap, isNull);
+      expect(defaultContent.overflow, isNull);
+      expect(defaultContent.textWidthBasis, isNull);
+      expect(defaultContent.effectiveSoftWrap, isTrue);
+      expect(defaultContent.effectiveOverflow, TextOverflow.clip);
+      expect(defaultContent.effectiveTextWidthBasis, TextWidthBasis.parent);
+
+      const defaultSurface = SurfaceStyle();
+      expect(defaultSurface.clipBehavior, isNull);
+      expect(defaultSurface.opacity, isNull);
+      expect(defaultSurface.effectiveClipBehavior, Clip.none);
+      expect(defaultSurface.effectiveOpacity, 1);
     });
 
     test('content parts resolve text and icon style fragments', () {
@@ -1169,6 +1218,32 @@ void main() {
       ).resolve(tokens, const [ButtonTone.primary]);
       expect(inputDecoration.contentPadding, const EdgeInsets.all(12));
       expect(inputDecoration.fillColor, Colors.blue);
+
+      final textField = VariantStyle.textFieldParts<TestTokens>(
+        base: (_) => {
+          TextFieldStylePart.text({TextStylePart.fontSize(14)}),
+          TextFieldStylePart.decoration({
+            InputDecorationPart.contentPadding(const EdgeInsets.all(12)),
+          }),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            TextFieldStylePart.text({TextStylePart.color(tokens.primary)}),
+            TextFieldStylePart.decoration({
+              InputDecorationPart.fillColor(tokens.primary),
+            }),
+            TextFieldStylePart.textAlign(TextAlign.center),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+      expect(textField.textStyle.fontSize, 14);
+      expect(textField.textStyle.color, Colors.blue);
+      expect(
+        textField.decorationTheme.contentPadding,
+        const EdgeInsets.all(12),
+      );
+      expect(textField.decorationTheme.fillColor, Colors.blue);
+      expect(textField.textAlign, TextAlign.center);
 
       final listTile = VariantStyle.listTileParts<TestTokens>(
         base: (_) => {ListTilePart.contentPadding(const EdgeInsets.all(12))},

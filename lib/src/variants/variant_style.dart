@@ -177,6 +177,37 @@ class VariantStyle<TTokens, TValue> {
     compoundVariants: compoundVariants,
   );
 
+  static VariantStyle<TTokens, TextFieldStyle> textField<TTokens>({
+    required ThemeVariantBuilder<TTokens, TextFieldStyle> base,
+    Map<Object, ThemeVariantBuilder<TTokens, TextFieldStyle>> variants =
+        const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariant<TTokens, TextFieldStyle>> compoundVariants =
+        const [],
+  }) => createVariantStyle(
+    base: base,
+    merge: mergeTextFieldStyle,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
+  static VariantStyle<TTokens, TextFieldStyle> textFieldParts<TTokens>({
+    required ThemeVariantPartsBuilder<TTokens, TextFieldStyle> base,
+    Map<Object, ThemeVariantPartsBuilder<TTokens, TextFieldStyle>> variants =
+        const {},
+    Iterable<Object> defaultVariants = const [],
+    Iterable<CompoundVariantParts<TTokens, TextFieldStyle>> compoundVariants =
+        const [],
+  }) => createPartsVariantStyle(
+    seed: const TextFieldStyle(),
+    merge: mergeTextFieldStyle,
+    base: base,
+    variants: variants,
+    defaultVariants: defaultVariants,
+    compoundVariants: compoundVariants,
+  );
+
   static VariantStyle<TTokens, ListTileThemeData> listTile<TTokens>({
     required ThemeVariantBuilder<TTokens, ListTileThemeData> base,
     Map<Object, ThemeVariantBuilder<TTokens, ListTileThemeData>> variants =

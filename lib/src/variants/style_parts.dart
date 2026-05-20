@@ -140,6 +140,31 @@ class InputDecorationPart {
   }
 }
 
+class TextFieldStylePart {
+  const TextFieldStylePart._();
+
+  static StylePart<TextFieldStyle> textAlign(TextAlign textAlign) {
+    return (style) => style.copyWith(textAlign: textAlign);
+  }
+
+  static StylePart<TextFieldStyle> text(Iterable<StylePart<TextStyle>> parts) {
+    return (style) => style.copyWith(
+      textStyle: applyStyleParts<TextStyle>(style.textStyle, parts),
+    );
+  }
+
+  static StylePart<TextFieldStyle> decoration(
+    Iterable<StylePart<InputDecorationThemeData>> parts,
+  ) {
+    return (style) => style.copyWith(
+      decorationTheme: applyStyleParts<InputDecorationThemeData>(
+        style.decorationTheme,
+        parts,
+      ),
+    );
+  }
+}
+
 class ListTilePart {
   const ListTilePart._();
 

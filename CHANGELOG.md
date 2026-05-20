@@ -1,3 +1,13 @@
+## 0.1.2
+
+* Added `TextFieldStyle` for resolving editable text, input decoration,
+  cursor color, and text alignment styles together.
+* Added `VariantStyle.textField` and `VariantStyle.textFieldParts`.
+* Added `TextFieldStylePart` helpers for text style, decoration theme, and
+  text alignment fragments.
+* Preserved nullable patch semantics for content, surface, and text field
+  variant merging so omitted fields do not reset base style values.
+
 ## 0.1.1
 
 * Breaking: Renamed light and dark from ThemeVariant to lightTokens and darkTokens

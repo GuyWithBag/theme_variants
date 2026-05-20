@@ -11,3 +11,4 @@ export 'src/widgets/theme_variants_override.dart';
 export 'src/widgets/theme_variants_provider.dart';
 export 'src/models/surface_style.dart';
 export 'src/models/content_style.dart';
+export 'src/models/text_field_style.dart';
