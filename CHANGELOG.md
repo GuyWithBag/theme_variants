@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Breaking: Renamed light and dark from ThemeVariant to lightTokens and darkTokens
+
 ## 0.1.0
 
 * Breaking: replaced theme entries with preset-based theme models. Use
