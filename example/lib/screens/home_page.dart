@@ -28,31 +28,10 @@ class HomePage extends StatelessWidget {
               'radius ${tokens.radius.toStringAsFixed(0)} / spacing ${tokens.spaceSm.toStringAsFixed(0)}-${tokens.spaceLg.toStringAsFixed(0)}',
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              style: buttonStyle.resolve(tokens, const [
-                ButtonSize.lg,
-                ButtonTone.primary,
-              ]),
-              onPressed: () {},
-              child: const Text('Primary large'),
-            ),
-            const SizedBox(height: 12),
-            FilledButton(
-              style: buttonStyle.resolve(tokens, const [
-                ButtonSize.sm,
-                ButtonTone.danger,
-              ]),
-              onPressed: () {},
-              child: const Text('Danger small'),
-            ),
-            const SizedBox(height: 12),
-            FilledButton(
-              style: buttonStyle.resolve(tokens, const [
-                ButtonSize.lg,
-                ButtonTone.danger,
-              ]),
-              onPressed: () {},
-              child: const Text('Danger large compound'),
+            VariantShowcaseGrid<AppTokens>(
+              title: const Text('Button variants'),
+              style: buttonStyle,
+              previewText: 'Action',
             ),
             const SizedBox(height: 24),
             SegmentedButton<ThemeMode>(

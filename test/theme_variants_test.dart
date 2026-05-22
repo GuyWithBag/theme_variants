@@ -1325,4 +1325,118 @@ void main() {
       expect(resolved.fontWeight, FontWeight.w700);
     });
   });
+
+  group('VariantShowcaseGrid', () {
+    testWidgets('renders every combination from the supplied axes', (
+      tester,
+    ) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        presets: [singlePreset('clean', 'clean')],
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+      final style = VariantStyle<TestTokens, TextStyle>(
+        base: (_) => const TextStyle(fontSize: 14),
+        merge: mergeTextStyle,
+        variants: {
+          ButtonSize.sm: (_) => const TextStyle(fontSize: 12),
+          ButtonSize.md: (_) => const TextStyle(fontSize: 14),
+          ButtonTone.primary: (_) => const TextStyle(color: Colors.blue),
+          ButtonTone.danger: (_) => const TextStyle(color: Colors.red),
+        },
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: MaterialApp(
+            home: Scaffold(
+              body: VariantShowcaseGrid<TestTokens>(
+                title: const Text('Text variants'),
+                style: style,
+                axes: const [
+                  VariantShowcaseAxis(
+                    label: 'Size',
+                    variants: [ButtonSize.sm, ButtonSize.md],
+                    labels: {ButtonSize.sm: 'Small', ButtonSize.md: 'Medium'},
+                  ),
+                  VariantShowcaseAxis(
+                    label: 'Tone',
+                    variants: [ButtonTone.primary, ButtonTone.danger],
+                    labels: {
+                      ButtonTone.primary: 'Primary',
+                      ButtonTone.danger: 'Danger',
+                    },
+                  ),
+                ],
+                builder: (context, textStyle, selectedVariants) {
+                  return Text(selectedVariants.join('|'), style: textStyle);
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Text variants'), findsOneWidget);
+      expect(find.text('SIZE'), findsNWidgets(4));
+      expect(find.text('TONE'), findsNWidgets(4));
+      expect(find.text('Small'), findsNWidgets(2));
+      expect(find.text('Medium'), findsNWidgets(2));
+      expect(find.text('Primary'), findsNWidgets(2));
+      expect(find.text('Danger'), findsNWidgets(2));
+      expect(find.text('ButtonSize.sm|ButtonTone.primary'), findsOneWidget);
+      expect(find.text('ButtonSize.sm|ButtonTone.danger'), findsOneWidget);
+      expect(find.text('ButtonSize.md|ButtonTone.primary'), findsOneWidget);
+      expect(find.text('ButtonSize.md|ButtonTone.danger'), findsOneWidget);
+    });
+
+    testWidgets('can infer axes, preview text styles, and mark compounds', (
+      tester,
+    ) async {
+      final registry = ThemeVariantRegistry<TestTokens>(
+        presets: [singlePreset('clean', 'clean')],
+      );
+      final controller = ThemeVariantsController<TestTokens>(
+        registry: registry,
+        lightThemeId: 'clean',
+        darkThemeId: 'clean',
+      );
+      final style = VariantStyle<TestTokens, TextStyle>(
+        base: (_) => const TextStyle(fontSize: 14),
+        merge: mergeTextStyle,
+        variants: {
+          ButtonSize.sm: (_) => const TextStyle(fontSize: 12),
+          ButtonSize.md: (_) => const TextStyle(fontSize: 14),
+          ButtonTone.primary: (_) => const TextStyle(color: Colors.blue),
+          ButtonTone.danger: (_) => const TextStyle(color: Colors.red),
+        },
+        compoundVariants: [
+          CompoundVariant(
+            when: const {ButtonSize.md, ButtonTone.danger},
+            build: (_) => const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ThemeVariantsProvider<TestTokens>(
+          controller: controller,
+          child: MaterialApp(
+            home: Scaffold(body: VariantShowcaseGrid<TestTokens>(style: style)),
+          ),
+        ),
+      );
+
+      expect(find.text('Preview'), findsNWidgets(4));
+      expect(find.text('sm'), findsNWidgets(2));
+      expect(find.text('md'), findsNWidgets(2));
+      expect(find.text('primary'), findsNWidgets(2));
+      expect(find.text('danger'), findsNWidgets(2));
+      expect(find.text('Compound'), findsOneWidget);
+    });
+  });
 }

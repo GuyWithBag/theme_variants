@@ -9,9 +9,9 @@ void main() {
     await tester.pumpWidget(const App());
 
     expect(find.text('Active theme: Clean Light'), findsOneWidget);
-    expect(find.text('Primary large'), findsOneWidget);
-    expect(find.text('Danger small'), findsOneWidget);
-    expect(find.text('Danger large compound'), findsOneWidget);
+    expect(find.text('Button variants'), findsOneWidget);
+    expect(find.text('Action'), findsNWidgets(6));
+    expect(find.text('Compound'), findsOneWidget);
     expect(find.text('Overridden flashcard'), findsOneWidget);
     expect(find.text('Inherited flashcard'), findsOneWidget);
     expect(find.text('Card theme: Forest Light'), findsOneWidget);
@@ -21,7 +21,11 @@ void main() {
   testWidgets('can force the dark theme independently', (tester) async {
     await tester.pumpWidget(const App());
 
-    await tester.tap(find.text('Dark'));
+    final darkThemeMode = find.text('Dark');
+    await tester.ensureVisible(darkThemeMode);
+    await tester.pumpAndSettle();
+
+    await tester.tap(darkThemeMode);
     await tester.pumpAndSettle();
 
     expect(find.text('Active theme: Forest Dark'), findsOneWidget);
@@ -30,7 +34,11 @@ void main() {
   testWidgets('can switch the selected light theme', (tester) async {
     await tester.pumpWidget(const App());
 
-    await tester.tap(find.byType(DropdownButton<String>).first);
+    final lightThemeDropdown = find.byType(DropdownButton<String>).first;
+    await tester.ensureVisible(lightThemeDropdown);
+    await tester.pumpAndSettle();
+
+    await tester.tap(lightThemeDropdown);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Forest Light').last);
     await tester.pumpAndSettle();
