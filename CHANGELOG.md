@@ -1,3 +1,10 @@
+## 0.2.0
+
+* Added `VariantShowcaseGrid`, a public widget for automatically displaying
+  available variant styles.
+* Updated the example app to demonstrate the showcase grid and added tests for
+  the new widget behavior.
+
 ## 0.1.2
 
 * Added `TextFieldStyle` for resolving editable text, input decoration,
