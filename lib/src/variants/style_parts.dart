@@ -162,9 +162,23 @@ class TextFieldStylePart {
   }
 
   static StylePart<TextFieldStyle> text(Iterable<StylePart<TextStyle>> parts) {
-    return (style) => style.copyWith(
-      textStyle: applyStyleParts<TextStyle>(style.textStyle, parts),
-    );
+    return content({ContentStylePart.text(parts)});
+  }
+
+  static StylePart<TextFieldStyle> content(
+    Iterable<StylePart<ContentStyle>> parts,
+  ) {
+    return (style) {
+      final resolvedContent = applyStyleParts<ContentStyle>(
+        ContentStyle(textStyle: style.textStyle, textAlign: style.textAlign),
+        parts,
+      );
+
+      return style.copyWith(
+        textStyle: resolvedContent.textStyle,
+        textAlign: resolvedContent.textAlign,
+      );
+    };
   }
 
   static StylePart<TextFieldStyle> decoration(
@@ -258,6 +272,36 @@ class ChipPart {
 
   static StylePart<ChipThemeData> secondaryLabelStyle(TextStyle style) {
     return (theme) => theme.copyWith(secondaryLabelStyle: style);
+  }
+
+  static StylePart<ChipThemeData> text(Iterable<StylePart<TextStyle>> parts) {
+    return content({ContentStylePart.text(parts)});
+  }
+
+  static StylePart<ChipThemeData> icon(
+    Iterable<StylePart<IconThemeData>> parts,
+  ) {
+    return content({ContentStylePart.icon(parts)});
+  }
+
+  static StylePart<ChipThemeData> content(
+    Iterable<StylePart<ContentStyle>> parts,
+  ) {
+    return (theme) {
+      final resolvedContent = applyStyleParts<ContentStyle>(
+        ContentStyle(
+          textStyle: theme.labelStyle ?? const TextStyle(),
+          iconTheme: theme.iconTheme ?? const IconThemeData(),
+        ),
+        parts,
+      );
+
+      return theme.copyWith(
+        labelStyle: resolvedContent.textStyle,
+        secondaryLabelStyle: resolvedContent.textStyle,
+        iconTheme: resolvedContent.iconTheme,
+      );
+    };
   }
 
   static StylePart<ChipThemeData> deleteIconColor(Color color) {

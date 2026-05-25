@@ -1239,7 +1239,9 @@ void main() {
                 ),
               ),
             }),
-            TextFieldStylePart.textAlign(TextAlign.center),
+            TextFieldStylePart.content({
+              ContentStylePart.textAlign(TextAlign.center),
+            }),
             TextFieldStylePart.cursorColor(tokens.primary),
           },
         },
@@ -1291,7 +1293,10 @@ void main() {
           ButtonTone.primary: (tokens) => {
             ChipPart.backgroundColor(tokens.primary),
             ChipPart.selectedColor(tokens.primary),
-            ChipPart.secondaryLabelStyle(const TextStyle(color: Colors.white)),
+            ChipPart.content({
+              ContentStylePart.text({TextStylePart.color(Colors.white)}),
+              ContentStylePart.icon({IconThemePart.color(Colors.white)}),
+            }),
           },
         },
       ).resolve(tokens, const [ButtonTone.primary]);
@@ -1299,6 +1304,7 @@ void main() {
       expect(chip.backgroundColor, Colors.blue);
       expect(chip.selectedColor, Colors.blue);
       expect(chip.secondaryLabelStyle?.color, Colors.white);
+      expect(chip.iconTheme?.color, Colors.white);
       expect(chip.showCheckmark, isFalse);
 
       final navigationBar = VariantStyle.navigationBarParts<TestTokens>(

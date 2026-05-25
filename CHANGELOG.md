@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Added content-style helpers to `ChipPart` and `TextFieldStylePart`.
+
 ## 0.2.2
 
 * Added `InputDecorationPart.disabledBorder`.
