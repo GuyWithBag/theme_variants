@@ -1,3 +1,10 @@
+## 0.2.1
+
+* Added more `ChipPart` helpers for selected colors, secondary label styling,
+  checkmark visibility, icon theme, and related chip theme fields.
+* Added `TextStylePart.letterSpacing` and `TextFieldStylePart.cursorColor`.
+* Allowed `Surface` to be constructed without an explicit style or child.
+
 ## 0.2.0
 
 * Added `VariantShowcaseGrid`, a public widget for automatically displaying

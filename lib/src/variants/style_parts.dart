@@ -73,6 +73,10 @@ class TextStylePart {
     return (style) => style.copyWith(height: height);
   }
 
+  static StylePart<TextStyle> letterSpacing(double letterSpacing) {
+    return (style) => style.copyWith(letterSpacing: letterSpacing);
+  }
+
   static StylePart<TextStyle> decoration(TextDecoration decoration) {
     return (style) => style.copyWith(decoration: decoration);
   }
@@ -145,6 +149,10 @@ class TextFieldStylePart {
 
   static StylePart<TextFieldStyle> textAlign(TextAlign textAlign) {
     return (style) => style.copyWith(textAlign: textAlign);
+  }
+
+  static StylePart<TextFieldStyle> cursorColor(Color cursorColor) {
+    return (style) => style.copyWith(cursorColor: cursorColor);
   }
 
   static StylePart<TextFieldStyle> text(Iterable<StylePart<TextStyle>> parts) {
@@ -226,8 +234,42 @@ class ChipPart {
     return (theme) => theme.copyWith(backgroundColor: color);
   }
 
+  static StylePart<ChipThemeData> selectedColor(Color color) {
+    return (theme) => theme.copyWith(selectedColor: color);
+  }
+
+  static StylePart<ChipThemeData> secondarySelectedColor(Color color) {
+    return (theme) => theme.copyWith(secondarySelectedColor: color);
+  }
+
+  static StylePart<ChipThemeData> disabledColor(Color color) {
+    return (theme) => theme.copyWith(disabledColor: color);
+  }
+
   static StylePart<ChipThemeData> labelStyle(TextStyle style) {
     return (theme) => theme.copyWith(labelStyle: style);
+  }
+
+  static StylePart<ChipThemeData> secondaryLabelStyle(TextStyle style) {
+    return (theme) => theme.copyWith(secondaryLabelStyle: style);
+  }
+
+  static StylePart<ChipThemeData> deleteIconColor(Color color) {
+    return (theme) => theme.copyWith(deleteIconColor: color);
+  }
+
+  static StylePart<ChipThemeData> checkmarkColor(Color color) {
+    return (theme) => theme.copyWith(checkmarkColor: color);
+  }
+
+  static StylePart<ChipThemeData> showCheckmark(bool showCheckmark) {
+    return (theme) => theme.copyWith(showCheckmark: showCheckmark);
+  }
+
+  static StylePart<ChipThemeData> labelPadding(
+    EdgeInsetsGeometry labelPadding,
+  ) {
+    return (theme) => theme.copyWith(labelPadding: labelPadding);
   }
 
   static StylePart<ChipThemeData> padding(EdgeInsetsGeometry padding) {
@@ -244,6 +286,14 @@ class ChipPart {
 
   static StylePart<ChipThemeData> elevation(double elevation) {
     return (theme) => theme.copyWith(elevation: elevation);
+  }
+
+  static StylePart<ChipThemeData> pressElevation(double pressElevation) {
+    return (theme) => theme.copyWith(pressElevation: pressElevation);
+  }
+
+  static StylePart<ChipThemeData> iconTheme(IconThemeData iconTheme) {
+    return (theme) => theme.copyWith(iconTheme: iconTheme);
   }
 }
 

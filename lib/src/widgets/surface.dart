@@ -8,53 +8,56 @@ import 'package:theme_variants/theme_variants.dart';
 /// and icon styling.
 class Surface extends StatelessWidget {
   const Surface({
-    required this.style,
-    required this.child,
+    this.style,
+    this.child,
     this.duration,
     this.curve = Curves.linear,
     this.onEnd,
     super.key,
   });
 
-  final SurfaceStyle style;
-  final Widget child;
+  final SurfaceStyle? style;
+  final Widget? child;
   final Duration? duration;
   final Curve curve;
   final VoidCallback? onEnd;
 
   @override
   Widget build(BuildContext context) {
+    final resolvedStyle = style ?? const SurfaceStyle();
+    final resolvedChild = child ?? const SizedBox.shrink();
+
     final content = IconTheme(
-      data: style.iconTheme,
+      data: resolvedStyle.iconTheme,
       child: DefaultTextStyle(
-        style: style.textStyle,
-        textAlign: style.contentStyle.textAlign,
-        softWrap: style.contentStyle.effectiveSoftWrap,
-        overflow: style.contentStyle.effectiveOverflow,
-        maxLines: style.contentStyle.maxLines,
-        textWidthBasis: style.contentStyle.effectiveTextWidthBasis,
-        textHeightBehavior: style.contentStyle.textHeightBehavior,
-        child: child,
+        style: resolvedStyle.textStyle,
+        textAlign: resolvedStyle.contentStyle.textAlign,
+        softWrap: resolvedStyle.contentStyle.effectiveSoftWrap,
+        overflow: resolvedStyle.contentStyle.effectiveOverflow,
+        maxLines: resolvedStyle.contentStyle.maxLines,
+        textWidthBasis: resolvedStyle.contentStyle.effectiveTextWidthBasis,
+        textHeightBehavior: resolvedStyle.contentStyle.textHeightBehavior,
+        child: resolvedChild,
       ),
     );
 
-    final styledContent = style.effectiveOpacity == 1
+    final styledContent = resolvedStyle.effectiveOpacity == 1
         ? content
-        : Opacity(opacity: style.effectiveOpacity, child: content);
+        : Opacity(opacity: resolvedStyle.effectiveOpacity, child: content);
 
     if (duration case final duration?) {
       return AnimatedContainer(
-        alignment: style.alignment,
-        padding: style.padding,
-        decoration: style.decoration,
-        foregroundDecoration: style.foregroundDecoration,
-        width: style.width,
-        height: style.height,
-        constraints: style.constraints,
-        margin: style.margin,
-        transform: style.transform,
-        transformAlignment: style.transformAlignment,
-        clipBehavior: style.effectiveClipBehavior,
+        alignment: resolvedStyle.alignment,
+        padding: resolvedStyle.padding,
+        decoration: resolvedStyle.decoration,
+        foregroundDecoration: resolvedStyle.foregroundDecoration,
+        width: resolvedStyle.width,
+        height: resolvedStyle.height,
+        constraints: resolvedStyle.constraints,
+        margin: resolvedStyle.margin,
+        transform: resolvedStyle.transform,
+        transformAlignment: resolvedStyle.transformAlignment,
+        clipBehavior: resolvedStyle.effectiveClipBehavior,
         duration: duration,
         curve: curve,
         onEnd: onEnd,
@@ -63,17 +66,17 @@ class Surface extends StatelessWidget {
     }
 
     return Container(
-      alignment: style.alignment,
-      padding: style.padding,
-      decoration: style.decoration,
-      foregroundDecoration: style.foregroundDecoration,
-      width: style.width,
-      height: style.height,
-      constraints: style.constraints,
-      margin: style.margin,
-      transform: style.transform,
-      transformAlignment: style.transformAlignment,
-      clipBehavior: style.effectiveClipBehavior,
+      alignment: resolvedStyle.alignment,
+      padding: resolvedStyle.padding,
+      decoration: resolvedStyle.decoration,
+      foregroundDecoration: resolvedStyle.foregroundDecoration,
+      width: resolvedStyle.width,
+      height: resolvedStyle.height,
+      constraints: resolvedStyle.constraints,
+      margin: resolvedStyle.margin,
+      transform: resolvedStyle.transform,
+      transformAlignment: resolvedStyle.transformAlignment,
+      clipBehavior: resolvedStyle.effectiveClipBehavior,
       child: styledContent,
     );
   }

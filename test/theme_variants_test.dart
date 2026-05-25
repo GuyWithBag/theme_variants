@@ -1179,6 +1179,7 @@ void main() {
         base: (_) => {
           TextStylePart.fontSize(14),
           TextStylePart.color(Colors.black),
+          TextStylePart.letterSpacing(1.2),
         },
         variants: {
           ButtonTone.primary: (tokens) => {TextStylePart.color(tokens.primary)},
@@ -1186,6 +1187,7 @@ void main() {
       ).resolve(tokens, const [ButtonTone.primary]);
       expect(text.color, Colors.blue);
       expect(text.fontSize, 14);
+      expect(text.letterSpacing, 1.2);
 
       final textTheme = VariantStyle.textThemeParts<TestTokens>(
         base: (_) => {TextThemePart.titleMedium(const TextStyle(fontSize: 18))},
@@ -1233,6 +1235,7 @@ void main() {
               InputDecorationPart.fillColor(tokens.primary),
             }),
             TextFieldStylePart.textAlign(TextAlign.center),
+            TextFieldStylePart.cursorColor(tokens.primary),
           },
         },
       ).resolve(tokens, const [ButtonTone.primary]);
@@ -1244,6 +1247,7 @@ void main() {
       );
       expect(textField.decorationTheme.fillColor, Colors.blue);
       expect(textField.textAlign, TextAlign.center);
+      expect(textField.cursorColor, Colors.blue);
 
       final listTile = VariantStyle.listTileParts<TestTokens>(
         base: (_) => {ListTilePart.contentPadding(const EdgeInsets.all(12))},
@@ -1266,15 +1270,23 @@ void main() {
       expect(card.color, Colors.blue);
 
       final chip = VariantStyle.chipParts<TestTokens>(
-        base: (_) => {ChipPart.padding(const EdgeInsets.all(12))},
+        base: (_) => {
+          ChipPart.padding(const EdgeInsets.all(12)),
+          ChipPart.showCheckmark(false),
+        },
         variants: {
           ButtonTone.primary: (tokens) => {
             ChipPart.backgroundColor(tokens.primary),
+            ChipPart.selectedColor(tokens.primary),
+            ChipPart.secondaryLabelStyle(const TextStyle(color: Colors.white)),
           },
         },
       ).resolve(tokens, const [ButtonTone.primary]);
       expect(chip.padding, const EdgeInsets.all(12));
       expect(chip.backgroundColor, Colors.blue);
+      expect(chip.selectedColor, Colors.blue);
+      expect(chip.secondaryLabelStyle?.color, Colors.white);
+      expect(chip.showCheckmark, isFalse);
 
       final navigationBar = VariantStyle.navigationBarParts<TestTokens>(
         base: (_) => {NavigationBarPart.height(72)},
