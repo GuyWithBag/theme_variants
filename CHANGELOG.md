@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Added `InputDecorationPart.disabledBorder`.
+
 ## 0.2.1
 
 * Added more `ChipPart` helpers for selected colors, secondary label styling,

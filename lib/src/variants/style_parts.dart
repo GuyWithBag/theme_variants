@@ -142,6 +142,12 @@ class InputDecorationPart {
   static StylePart<InputDecorationThemeData> focusedBorder(InputBorder border) {
     return (theme) => theme.copyWith(focusedBorder: border);
   }
+
+  static StylePart<InputDecorationThemeData> disabledBorder(
+    InputBorder border,
+  ) {
+    return (theme) => theme.copyWith(disabledBorder: border);
+  }
 }
 
 class TextFieldStylePart {

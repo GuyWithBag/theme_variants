@@ -1233,6 +1233,11 @@ void main() {
             TextFieldStylePart.text({TextStylePart.color(tokens.primary)}),
             TextFieldStylePart.decoration({
               InputDecorationPart.fillColor(tokens.primary),
+              InputDecorationPart.disabledBorder(
+                UnderlineInputBorder(
+                  borderSide: BorderSide(color: tokens.primary),
+                ),
+              ),
             }),
             TextFieldStylePart.textAlign(TextAlign.center),
             TextFieldStylePart.cursorColor(tokens.primary),
@@ -1246,6 +1251,14 @@ void main() {
         const EdgeInsets.all(12),
       );
       expect(textField.decorationTheme.fillColor, Colors.blue);
+      expect(
+        textField.decorationTheme.disabledBorder,
+        isA<UnderlineInputBorder>().having(
+          (border) => border.borderSide.color,
+          'border color',
+          Colors.blue,
+        ),
+      );
       expect(textField.textAlign, TextAlign.center);
       expect(textField.cursorColor, Colors.blue);
 
