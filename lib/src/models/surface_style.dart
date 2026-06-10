@@ -45,6 +45,9 @@ class SurfaceStyle {
 
   Clip get effectiveClipBehavior => clipBehavior ?? Clip.none;
 
+  BorderRadiusGeometry get effectiveBorderRadius =>
+      decoration.borderRadius ?? BorderRadius.zero;
+
   SurfaceStyle copyWith({
     BoxDecoration? decoration,
     BoxDecoration? foregroundDecoration,

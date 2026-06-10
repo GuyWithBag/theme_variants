@@ -29,9 +29,8 @@ class ContentStyle {
 
   TextOverflow get effectiveOverflow => overflow ?? TextOverflow.clip;
 
-  TextWidthBasis get effectiveTextWidthBasis {
-    return textWidthBasis ?? TextWidthBasis.parent;
-  }
+  TextWidthBasis get effectiveTextWidthBasis =>
+      textWidthBasis ?? TextWidthBasis.parent;
 
   ContentStyle copyWith({
     TextStyle? textStyle,

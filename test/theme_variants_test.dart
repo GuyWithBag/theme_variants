@@ -1059,6 +1059,28 @@ void main() {
       expect(find.text('text:true icon:true'), findsOneWidget);
     });
 
+    testWidgets('Surface clips rounded decorations', (tester) async {
+      const style = SurfaceStyle(
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+      );
+
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: Surface(style: style, child: Text('rounded')),
+        ),
+      );
+
+      final clip = tester.widget<ClipRRect>(find.byType(ClipRRect));
+
+      expect(clip.borderRadius, BorderRadius.circular(12));
+      expect(find.byType(Container), findsOneWidget);
+      expect(find.text('rounded'), findsOneWidget);
+    });
+
     test('content constructor merges text and icon style values', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.content<TestTokens>(
