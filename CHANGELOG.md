@@ -1,3 +1,8 @@
+## 0.2.5
+
+* fix(Surface): ClipRRect is a child of Container instead of the parent of
+the Container
+
 ## 0.2.4
 
 * Made `Surface` clip rounded decorations automatically.
