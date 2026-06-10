@@ -47,28 +47,8 @@ class Surface extends StatelessWidget {
         ? content
         : Opacity(opacity: resolvedStyle.effectiveOpacity, child: content);
 
-    Widget getContainer() {
-      if (duration case final duration?) {
-        return AnimatedContainer(
-          alignment: resolvedStyle.alignment,
-          padding: resolvedStyle.padding,
-          decoration: resolvedStyle.decoration,
-          foregroundDecoration: resolvedStyle.foregroundDecoration,
-          width: resolvedStyle.width,
-          height: resolvedStyle.height,
-          constraints: resolvedStyle.constraints,
-          margin: resolvedStyle.margin,
-          transform: resolvedStyle.transform,
-          transformAlignment: resolvedStyle.transformAlignment,
-          clipBehavior: resolvedStyle.effectiveClipBehavior,
-          duration: duration,
-          curve: curve,
-          onEnd: onEnd,
-          child: styledContent,
-        );
-      }
-
-      return Container(
+    if (duration case final duration?) {
+      return AnimatedContainer(
         alignment: resolvedStyle.alignment,
         padding: resolvedStyle.padding,
         decoration: resolvedStyle.decoration,
@@ -80,20 +60,36 @@ class Surface extends StatelessWidget {
         transform: resolvedStyle.transform,
         transformAlignment: resolvedStyle.transformAlignment,
         clipBehavior: resolvedStyle.effectiveClipBehavior,
-        child: styledContent,
+        duration: duration,
+        curve: curve,
+        onEnd: onEnd,
+        child: hasClipRRect
+            ? ClipRRect(
+                borderRadius: resolvedStyle.effectiveBorderRadius,
+                child: styledContent,
+              )
+            : styledContent,
       );
     }
 
-    final shouldClip =
-        hasClipRRect || resolvedStyle.decoration.borderRadius != null;
-
-    if (shouldClip) {
-      return ClipRRect(
-        borderRadius: resolvedStyle.effectiveBorderRadius,
-        child: getContainer(),
-      );
-    }
-
-    return getContainer();
+    return Container(
+      alignment: resolvedStyle.alignment,
+      padding: resolvedStyle.padding,
+      decoration: resolvedStyle.decoration,
+      foregroundDecoration: resolvedStyle.foregroundDecoration,
+      width: resolvedStyle.width,
+      height: resolvedStyle.height,
+      constraints: resolvedStyle.constraints,
+      margin: resolvedStyle.margin,
+      transform: resolvedStyle.transform,
+      transformAlignment: resolvedStyle.transformAlignment,
+      clipBehavior: resolvedStyle.effectiveClipBehavior,
+      child: hasClipRRect
+          ? ClipRRect(
+              borderRadius: resolvedStyle.effectiveBorderRadius,
+              child: styledContent,
+            )
+          : styledContent,
+    );
   }
 }
