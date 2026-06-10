@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Made `Surface` clip rounded decorations automatically.
+
 ## 0.2.3
 
 * Added content-style helpers to `ChipPart` and `TextFieldStylePart`.
