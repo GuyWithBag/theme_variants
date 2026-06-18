@@ -525,12 +525,15 @@ VariantStyle.text<AppTokens>(...)
 VariantStyle.textTheme<AppTokens>(...)
 VariantStyle.icon<AppTokens>(...)
 VariantStyle.inputDecoration<AppTokens>(...)
+VariantStyle.textField<AppTokens>(...)
 VariantStyle.listTile<AppTokens>(...)
 VariantStyle.card<AppTokens>(...)
 VariantStyle.chip<AppTokens>(...)
 VariantStyle.navigationBar<AppTokens>(...)
 VariantStyle.tabBar<AppTokens>(...)
 VariantStyle.decoration<AppTokens>(...)
+VariantStyle.surface<AppTokens>(...)
+VariantStyle.content<AppTokens>(...)
 ```
 
 Each shortcut also has a `...Parts` constructor when you prefer composable style
@@ -550,6 +553,65 @@ final cardDecoration = VariantStyle.decorationParts<AppTokens>(
   },
 );
 ```
+
+Full-value parts such as `DecorationPart.border(...)`,
+`DecorationPart.boxShadow(...)`, and `IconThemePart.shadows(...)` replace the
+whole field. Use the nested partial helpers when a variant should change only
+one field inside a shadow, border, or icon theme.
+
+```dart
+final badgeSurface = VariantStyle.surfaceParts<AppTokens>(
+  base: (tokens) => {
+    SurfaceStylePart.decoration({
+      DecorationPart.radius(tokens.radius),
+      DecorationPart.color(Colors.white),
+      DecorationPart.border(Border.all(color: Colors.black12, width: 1)),
+      DecorationPart.boxShadow(const [
+        BoxShadow(
+          color: Colors.black26,
+          offset: Offset(0, 2),
+          blurRadius: 8,
+        ),
+      ]),
+    }),
+    SurfaceStylePart.icon({
+      IconThemePart.size(18),
+      IconThemePart.shadows(const [
+        Shadow(
+          color: Colors.black26,
+          offset: Offset(0, 1),
+          blurRadius: 4,
+        ),
+      ]),
+    }),
+  },
+  variants: {
+    CardTone.highlighted: (tokens) => {
+      SurfaceStylePart.decoration({
+        DecorationPart.borderParts({
+          BorderPart.color(tokens.primary),
+        }),
+        DecorationPart.boxShadowParts({
+          BoxShadowPart.color(tokens.primary.withValues(alpha: 0.24)),
+        }),
+      }),
+      SurfaceStylePart.icon({
+        IconThemePart.color(tokens.primary),
+        IconThemePart.weight(600),
+        IconThemePart.shadowParts({
+          ShadowPart.color(tokens.primary.withValues(alpha: 0.32)),
+        }),
+      }),
+    },
+  },
+);
+```
+
+Partial helpers update the selected field while preserving the rest of the
+existing value. For example, `BorderPart.color(...)` keeps the current border
+width, and `BoxShadowPart.color(...)` keeps the current offset and blur radius.
+Use the optional `index` argument on `DecorationPart.boxShadowParts(...)` or
+`IconThemePart.shadowParts(...)` to update a shadow other than the first one.
 
 ## Compound Variants
 
