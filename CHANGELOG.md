@@ -1,7 +1,16 @@
+## 0.2.6
+
+* Fixed decoration part merging so changing one `SurfaceStylePart.decoration`
+  property preserves existing decoration fields such as `shape`.
+* Added partial decoration helpers for updating shadow list entries and border
+  side fields without replacing the full `boxShadow` list or `Border`.
+* Added missing `IconThemePart` helpers for icon font variation fields, opacity,
+  text scaling, and partial shadow updates.
+
 ## 0.2.5
 
 * fix(Surface): ClipRRect is a child of Container instead of the parent of
-the Container
+  the Container.
 
 ## 0.2.4
 
