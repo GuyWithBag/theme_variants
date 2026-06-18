@@ -1003,6 +1003,124 @@ void main() {
       expect(resolved.opacity, 0.75);
     });
 
+    test('surface decoration parts preserve unchanged decoration fields', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.surfaceParts<TestTokens>(
+        base: (tokens) => {
+          SurfaceStylePart.decoration({
+            DecorationPart.color(Colors.white),
+            DecorationPart.shape(BoxShape.circle),
+            DecorationPart.boxShadow(const [
+              BoxShadow(color: Colors.black26, blurRadius: 8),
+            ]),
+          }),
+        },
+        variants: {
+          CardTone.highlighted: (tokens) => {
+            SurfaceStylePart.decoration({DecorationPart.color(tokens.primary)}),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.decoration.color, Colors.blue);
+      expect(resolved.decoration.shape, BoxShape.circle);
+      expect(resolved.decoration.boxShadow, const [
+        BoxShadow(color: Colors.black26, blurRadius: 8),
+      ]);
+    });
+
+    test('surface shadow parts preserve unchanged shadows', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.surfaceParts<TestTokens>(
+        base: (_) => {
+          SurfaceStylePart.decoration({
+            DecorationPart.boxShadow(const [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(0, 2),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0, 6),
+                blurRadius: 16,
+              ),
+            ]),
+          }),
+        },
+        variants: {
+          CardTone.highlighted: (tokens) => {
+            SurfaceStylePart.decoration({
+              DecorationPart.boxShadowParts({
+                BoxShadowPart.color(tokens.primary),
+              }),
+            }),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [CardTone.highlighted]);
+
+      expect(resolved.decoration.boxShadow, const [
+        BoxShadow(
+          color: Colors.blue,
+          offset: Offset(0, 2),
+          blurRadius: 8,
+          spreadRadius: 1,
+        ),
+        BoxShadow(color: Colors.black12, offset: Offset(0, 6), blurRadius: 16),
+      ]);
+    });
+
+    test('surface border parts preserve unchanged border side fields', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final colorStyle = VariantStyle.surfaceParts<TestTokens>(
+        base: (_) => {
+          SurfaceStylePart.decoration({
+            DecorationPart.border(Border.all(color: Colors.red, width: 3)),
+          }),
+        },
+        variants: {
+          CardTone.highlighted: (tokens) => {
+            SurfaceStylePart.decoration({
+              DecorationPart.borderParts({BorderPart.color(tokens.primary)}),
+            }),
+          },
+        },
+      );
+      final widthStyle = VariantStyle.surfaceParts<TestTokens>(
+        base: (_) => {
+          SurfaceStylePart.decoration({
+            DecorationPart.border(Border.all(color: Colors.red, width: 3)),
+          }),
+        },
+        variants: {
+          CardTone.highlighted: (_) => {
+            SurfaceStylePart.decoration({
+              DecorationPart.borderParts({BorderPart.width(6)}),
+            }),
+          },
+        },
+      );
+
+      final colorResolved = colorStyle.resolve(tokens, const [
+        CardTone.highlighted,
+      ]);
+      final widthResolved = widthStyle.resolve(tokens, const [
+        CardTone.highlighted,
+      ]);
+      final colorBorder = colorResolved.decoration.border! as Border;
+      final widthBorder = widthResolved.decoration.border! as Border;
+
+      expect(colorBorder.top.color, Colors.blue);
+      expect(colorBorder.top.width, 3);
+      expect(widthBorder.top.color, Colors.red);
+      expect(widthBorder.top.width, 6);
+    });
+
     testWidgets('Surface applies box, text, icon, and opacity style', (
       tester,
     ) async {
@@ -1070,7 +1188,11 @@ void main() {
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.ltr,
-          child: Surface(style: style, child: Text('rounded')),
+          child: Surface(
+            style: style,
+            hasClipRRect: true,
+            child: Text('rounded'),
+          ),
         ),
       );
 
@@ -1222,13 +1344,38 @@ void main() {
       expect(textTheme.titleMedium?.color, Colors.blue);
 
       final icon = VariantStyle.iconParts<TestTokens>(
-        base: (_) => {IconThemePart.size(20)},
+        base: (_) => {
+          IconThemePart.size(20),
+          IconThemePart.fill(0.1),
+          IconThemePart.grade(50),
+          IconThemePart.opticalSize(24),
+          IconThemePart.shadows(const [
+            Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 8),
+            Shadow(color: Colors.black12, offset: Offset(0, 6), blurRadius: 16),
+          ]),
+        },
         variants: {
-          ButtonTone.primary: (tokens) => {IconThemePart.color(tokens.primary)},
+          ButtonTone.primary: (tokens) => {
+            IconThemePart.color(tokens.primary),
+            IconThemePart.weight(500),
+            IconThemePart.opacity(0.8),
+            IconThemePart.applyTextScaling(true),
+            IconThemePart.shadowParts({ShadowPart.color(tokens.primary)}),
+          },
         },
       ).resolve(tokens, const [ButtonTone.primary]);
       expect(icon.color, Colors.blue);
       expect(icon.size, 20);
+      expect(icon.fill, 0.1);
+      expect(icon.weight, 500);
+      expect(icon.grade, 50);
+      expect(icon.opticalSize, 24);
+      expect(icon.opacity, 0.8);
+      expect(icon.applyTextScaling, isTrue);
+      expect(icon.shadows, const [
+        Shadow(color: Colors.blue, offset: Offset(0, 2), blurRadius: 8),
+        Shadow(color: Colors.black12, offset: Offset(0, 6), blurRadius: 16),
+      ]);
 
       final inputDecoration = VariantStyle.inputDecorationParts<TestTokens>(
         base: (_) => {

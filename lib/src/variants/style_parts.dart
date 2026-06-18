@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:theme_variants/theme_variants.dart';
 
+import 'decoration_partials.dart';
+
 class CompoundVariantParts<TTokens, TValue> {
   const CompoundVariantParts({required this.when, required this.build});
 
@@ -105,12 +107,84 @@ class TextThemePart {
 class IconThemePart {
   const IconThemePart._();
 
+  static StylePart<IconThemeData> size(double size) {
+    return (theme) => theme.copyWith(size: size);
+  }
+
+  static StylePart<IconThemeData> fill(double fill) {
+    return (theme) => theme.copyWith(fill: fill);
+  }
+
+  static StylePart<IconThemeData> weight(double weight) {
+    return (theme) => theme.copyWith(weight: weight);
+  }
+
+  static StylePart<IconThemeData> grade(double grade) {
+    return (theme) => theme.copyWith(grade: grade);
+  }
+
+  static StylePart<IconThemeData> opticalSize(double opticalSize) {
+    return (theme) => theme.copyWith(opticalSize: opticalSize);
+  }
+
   static StylePart<IconThemeData> color(Color color) {
     return (theme) => theme.copyWith(color: color);
   }
 
-  static StylePart<IconThemeData> size(double size) {
-    return (theme) => theme.copyWith(size: size);
+  static StylePart<IconThemeData> opacity(double opacity) {
+    return (theme) => theme.copyWith(opacity: opacity);
+  }
+
+  static StylePart<IconThemeData> shadows(List<Shadow> shadows) {
+    return (theme) => theme.copyWith(shadows: shadows);
+  }
+
+  static StylePart<IconThemeData> shadowParts(
+    Iterable<StylePart<Shadow>> parts, {
+    int index = 0,
+  }) {
+    return (theme) {
+      final shadows = <Shadow>[
+        ...?theme.shadows?.map(PartialShadow.fromShadow),
+      ];
+
+      while (shadows.length <= index) {
+        shadows.add(const PartialShadow());
+      }
+
+      shadows[index] = applyStyleParts<Shadow>(shadows[index], parts);
+
+      return theme.copyWith(shadows: shadows);
+    };
+  }
+
+  static StylePart<IconThemeData> applyTextScaling(bool applyTextScaling) {
+    return (theme) => theme.copyWith(applyTextScaling: applyTextScaling);
+  }
+}
+
+class ShadowPart {
+  const ShadowPart._();
+
+  static StylePart<Shadow> color(Color color) {
+    return (shadow) => PartialShadow.fromShadow(
+      shadow,
+      hasColor: true,
+    ).copyPartial(color: color);
+  }
+
+  static StylePart<Shadow> offset(Offset offset) {
+    return (shadow) => PartialShadow.fromShadow(
+      shadow,
+      hasOffset: true,
+    ).copyPartial(offset: offset);
+  }
+
+  static StylePart<Shadow> blurRadius(double blurRadius) {
+    return (shadow) => PartialShadow.fromShadow(
+      shadow,
+      hasBlurRadius: true,
+    ).copyPartial(blurRadius: blurRadius);
   }
 }
 
@@ -284,6 +358,12 @@ class ChipPart {
     return content({ContentStylePart.icon(parts)});
   }
 
+  static StylePart<ChipThemeData> iconThemeParts(
+    Iterable<StylePart<IconThemeData>> parts,
+  ) {
+    return icon(parts);
+  }
+
   static StylePart<ChipThemeData> content(
     Iterable<StylePart<ContentStyle>> parts,
   ) {
@@ -426,6 +506,23 @@ class DecorationPart {
     return (decoration) => decoration.copyWith(border: border);
   }
 
+  static StylePart<BoxDecoration> borderParts(
+    Iterable<StylePart<Border>> parts,
+  ) {
+    return (decoration) {
+      final border = decoration.border is Border
+          ? decoration.border! as Border
+          : const Border();
+
+      return decoration.copyWith(
+        border: applyStyleParts<Border>(
+          PartialBorder.fromBorder(border),
+          parts,
+        ),
+      );
+    };
+  }
+
   static StylePart<BoxDecoration> borderRadius(BorderRadiusGeometry radius) {
     return (decoration) => decoration.copyWith(borderRadius: radius);
   }
@@ -438,8 +535,163 @@ class DecorationPart {
     return (decoration) => decoration.copyWith(boxShadow: boxShadow);
   }
 
+  static StylePart<BoxDecoration> boxShadowParts(
+    Iterable<StylePart<BoxShadow>> parts, {
+    int index = 0,
+  }) {
+    return (decoration) {
+      final boxShadow = <BoxShadow>[
+        ...?decoration.boxShadow?.map(PartialBoxShadow.fromShadow),
+      ];
+
+      while (boxShadow.length <= index) {
+        boxShadow.add(const PartialBoxShadow());
+      }
+
+      boxShadow[index] = applyStyleParts<BoxShadow>(boxShadow[index], parts);
+
+      return decoration.copyWith(boxShadow: boxShadow);
+    };
+  }
+
   static StylePart<BoxDecoration> shape(BoxShape shape) {
     return (decoration) => decoration.copyWith(shape: shape);
+  }
+}
+
+class BoxShadowPart {
+  const BoxShadowPart._();
+
+  static StylePart<BoxShadow> color(Color color) {
+    return (shadow) => PartialBoxShadow.fromShadow(
+      shadow,
+      hasColor: true,
+    ).copyPartial(color: color);
+  }
+
+  static StylePart<BoxShadow> offset(Offset offset) {
+    return (shadow) => PartialBoxShadow.fromShadow(
+      shadow,
+      hasOffset: true,
+    ).copyPartial(offset: offset);
+  }
+
+  static StylePart<BoxShadow> blurRadius(double blurRadius) {
+    return (shadow) => PartialBoxShadow.fromShadow(
+      shadow,
+      hasBlurRadius: true,
+    ).copyPartial(blurRadius: blurRadius);
+  }
+
+  static StylePart<BoxShadow> spreadRadius(double spreadRadius) {
+    return (shadow) => PartialBoxShadow.fromShadow(
+      shadow,
+      hasSpreadRadius: true,
+    ).copyPartial(spreadRadius: spreadRadius);
+  }
+
+  static StylePart<BoxShadow> blurStyle(BlurStyle blurStyle) {
+    return (shadow) => PartialBoxShadow.fromShadow(
+      shadow,
+      hasBlurStyle: true,
+    ).copyPartial(blurStyle: blurStyle);
+  }
+}
+
+class BorderSidePart {
+  const BorderSidePart._();
+
+  static StylePart<BorderSide> color(Color color) {
+    return (side) => PartialBorderSide.fromSide(
+      side,
+      hasColor: true,
+    ).copyPartial(color: color);
+  }
+
+  static StylePart<BorderSide> width(double width) {
+    return (side) => PartialBorderSide.fromSide(
+      side,
+      hasWidth: true,
+    ).copyPartial(width: width);
+  }
+
+  static StylePart<BorderSide> style(BorderStyle style) {
+    return (side) => PartialBorderSide.fromSide(
+      side,
+      hasStyle: true,
+    ).copyPartial(style: style);
+  }
+
+  static StylePart<BorderSide> strokeAlign(double strokeAlign) {
+    return (side) => PartialBorderSide.fromSide(
+      side,
+      hasStrokeAlign: true,
+    ).copyPartial(strokeAlign: strokeAlign);
+  }
+}
+
+class BorderPart {
+  const BorderPart._();
+
+  static StylePart<Border> side(Iterable<StylePart<BorderSide>> parts) {
+    return (border) => PartialBorder(
+      top: applyStyleParts<BorderSide>(border.top, parts),
+      right: applyStyleParts<BorderSide>(border.right, parts),
+      bottom: applyStyleParts<BorderSide>(border.bottom, parts),
+      left: applyStyleParts<BorderSide>(border.left, parts),
+    );
+  }
+
+  static StylePart<Border> color(Color color) {
+    return side({BorderSidePart.color(color)});
+  }
+
+  static StylePart<Border> width(double width) {
+    return side({BorderSidePart.width(width)});
+  }
+
+  static StylePart<Border> style(BorderStyle style) {
+    return side({BorderSidePart.style(style)});
+  }
+
+  static StylePart<Border> strokeAlign(double strokeAlign) {
+    return side({BorderSidePart.strokeAlign(strokeAlign)});
+  }
+
+  static StylePart<Border> top(Iterable<StylePart<BorderSide>> parts) {
+    return (border) => PartialBorder(
+      top: applyStyleParts<BorderSide>(border.top, parts),
+      right: border.right,
+      bottom: border.bottom,
+      left: border.left,
+    );
+  }
+
+  static StylePart<Border> right(Iterable<StylePart<BorderSide>> parts) {
+    return (border) => PartialBorder(
+      top: border.top,
+      right: applyStyleParts<BorderSide>(border.right, parts),
+      bottom: border.bottom,
+      left: border.left,
+    );
+  }
+
+  static StylePart<Border> bottom(Iterable<StylePart<BorderSide>> parts) {
+    return (border) => PartialBorder(
+      top: border.top,
+      right: border.right,
+      bottom: applyStyleParts<BorderSide>(border.bottom, parts),
+      left: border.left,
+    );
+  }
+
+  static StylePart<Border> left(Iterable<StylePart<BorderSide>> parts) {
+    return (border) => PartialBorder(
+      top: border.top,
+      right: border.right,
+      bottom: border.bottom,
+      left: applyStyleParts<BorderSide>(border.left, parts),
+    );
   }
 }
 

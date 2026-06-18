@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:theme_variants/theme_variants.dart';
 
+import 'decoration_partials.dart';
+
 /// Convenience merger for [TextStyle].
 TextStyle mergeTextStyle(TextStyle base, TextStyle next) => base.merge(next);
 
@@ -14,7 +16,9 @@ ButtonStyle mergeButtonStyle(ButtonStyle base, ButtonStyle next) {
 
 /// Convenience merger for [IconThemeData].
 IconThemeData mergeIconThemeData(IconThemeData base, IconThemeData next) {
-  return base.merge(next);
+  return base
+      .merge(next)
+      .copyWith(shadows: mergeShadows(base.shadows, next.shadows));
 }
 
 /// Convenience merger for [InputDecorationThemeData].
@@ -150,13 +154,21 @@ BoxDecoration mergeBoxDecoration(BoxDecoration base, BoxDecoration next) {
   return base.copyWith(
     color: next.color,
     image: next.image,
-    border: next.border,
+    border: mergeBoxBorder(base.border, next.border),
     borderRadius: next.borderRadius,
-    boxShadow: next.boxShadow,
+    boxShadow: mergeBoxShadows(base.boxShadow, next.boxShadow),
     gradient: next.gradient,
     backgroundBlendMode: next.backgroundBlendMode,
-    shape: next.shape,
+    shape: _mergeBoxShape(base.shape, next.shape),
   );
+}
+
+BoxShape _mergeBoxShape(BoxShape base, BoxShape next) {
+  if (base != BoxShape.rectangle && next == BoxShape.rectangle) {
+    return base;
+  }
+
+  return next;
 }
 
 /// Convenience merger for [SurfaceStyle].
