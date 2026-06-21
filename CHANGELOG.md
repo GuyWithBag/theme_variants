@@ -1,3 +1,17 @@
+## 0.2.7
+
+* Added partial input decoration helpers for updating borders without replacing
+  the full `InputDecorationThemeData`.
+* Added `TextFieldStylePart` border shortcuts for the input decoration borders.
+* Added partial border helpers for `InputBorder`, `BorderSide`, `BoxShadow`,
+  and `Shadow` values.
+* Fixed decoration part merging so changing one `SurfaceStylePart.decoration`
+  property preserves existing decoration fields such as `shape`.
+* Added partial decoration helpers for updating shadow list entries and border
+  side fields without replacing the full `boxShadow` list or `Border`.
+* Added missing `IconThemePart` helpers for icon font variation fields, opacity,
+  text scaling, and partial shadow updates.
+
 ## 0.2.6
 
 * Fixed decoration part merging so changing one `SurfaceStylePart.decoration`
