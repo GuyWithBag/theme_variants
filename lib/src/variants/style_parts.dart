@@ -209,18 +209,129 @@ class InputDecorationPart {
     return (theme) => theme.copyWith(border: border);
   }
 
+  static StylePart<InputDecorationThemeData> borderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      border: applyStyleParts<InputBorder>(
+        theme.border ?? const UnderlineInputBorder(),
+        parts,
+      ),
+    );
+  }
+
   static StylePart<InputDecorationThemeData> enabledBorder(InputBorder border) {
     return (theme) => theme.copyWith(enabledBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> enabledBorderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      enabledBorder: applyStyleParts<InputBorder>(
+        theme.enabledBorder ?? theme.border ?? const UnderlineInputBorder(),
+        parts,
+      ),
+    );
   }
 
   static StylePart<InputDecorationThemeData> focusedBorder(InputBorder border) {
     return (theme) => theme.copyWith(focusedBorder: border);
   }
 
+  static StylePart<InputDecorationThemeData> focusedBorderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      focusedBorder: applyStyleParts<InputBorder>(
+        theme.focusedBorder ?? theme.border ?? const UnderlineInputBorder(),
+        parts,
+      ),
+    );
+  }
+
   static StylePart<InputDecorationThemeData> disabledBorder(
     InputBorder border,
   ) {
     return (theme) => theme.copyWith(disabledBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> disabledBorderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      disabledBorder: applyStyleParts<InputBorder>(
+        theme.disabledBorder ?? theme.border ?? const UnderlineInputBorder(),
+        parts,
+      ),
+    );
+  }
+
+  static StylePart<InputDecorationThemeData> errorBorder(InputBorder border) {
+    return (theme) => theme.copyWith(errorBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> errorBorderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      errorBorder: applyStyleParts<InputBorder>(
+        theme.errorBorder ?? theme.border ?? const UnderlineInputBorder(),
+        parts,
+      ),
+    );
+  }
+
+  static StylePart<InputDecorationThemeData> focusedErrorBorder(
+    InputBorder border,
+  ) {
+    return (theme) => theme.copyWith(focusedErrorBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> focusedErrorBorderParts(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      focusedErrorBorder: applyStyleParts<InputBorder>(
+        theme.focusedErrorBorder ??
+            theme.focusedBorder ??
+            theme.border ??
+            const UnderlineInputBorder(),
+        parts,
+      ),
+    );
+  }
+
+  static StylePart<InputDecorationThemeData> outlineBorder(BorderSide border) {
+    return (theme) => theme.copyWith(outlineBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> outlineBorderParts(
+    Iterable<StylePart<BorderSide>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      outlineBorder: applyStyleParts<BorderSide>(
+        theme.outlineBorder ?? const BorderSide(),
+        parts,
+      ),
+    );
+  }
+
+  static StylePart<InputDecorationThemeData> activeIndicatorBorder(
+    BorderSide border,
+  ) {
+    return (theme) => theme.copyWith(activeIndicatorBorder: border);
+  }
+
+  static StylePart<InputDecorationThemeData> activeIndicatorBorderParts(
+    Iterable<StylePart<BorderSide>> parts,
+  ) {
+    return (theme) => theme.copyWith(
+      activeIndicatorBorder: applyStyleParts<BorderSide>(
+        theme.activeIndicatorBorder ?? const BorderSide(),
+        parts,
+      ),
+    );
   }
 }
 
@@ -264,6 +375,118 @@ class TextFieldStylePart {
         parts,
       ),
     );
+  }
+
+  static StylePart<TextFieldStyle> border(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.borderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> enabledBorder(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.enabledBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> focusedBorder(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.focusedBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> disabledBorder(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.disabledBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> errorBorder(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.errorBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> focusedErrorBorder(
+    Iterable<StylePart<InputBorder>> parts,
+  ) {
+    return decoration({InputDecorationPart.focusedErrorBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> outlineBorder(
+    Iterable<StylePart<BorderSide>> parts,
+  ) {
+    return decoration({InputDecorationPart.outlineBorderParts(parts)});
+  }
+
+  static StylePart<TextFieldStyle> activeIndicatorBorder(
+    Iterable<StylePart<BorderSide>> parts,
+  ) {
+    return decoration({InputDecorationPart.activeIndicatorBorderParts(parts)});
+  }
+}
+
+class InputBorderPart {
+  const InputBorderPart._();
+
+  static StylePart<InputBorder> borderSide(BorderSide borderSide) {
+    return (border) {
+      if (border is UnderlineInputBorder) {
+        return PartialUnderlineInputBorder.fromBorder(
+          border,
+          hasBorderSide: true,
+        ).copyPartial(borderSide: borderSide);
+      }
+      if (border is OutlineInputBorder) {
+        return PartialOutlineInputBorder.fromBorder(
+          border,
+          hasBorderSide: true,
+        ).copyPartial(borderSide: borderSide);
+      }
+      return border.copyWith(borderSide: borderSide);
+    };
+  }
+
+  static StylePart<InputBorder> borderSideParts(
+    Iterable<StylePart<BorderSide>> parts,
+  ) {
+    return (border) {
+      final resolvedSide = applyStyleParts<BorderSide>(
+        border.borderSide,
+        parts,
+      );
+      return borderSide(resolvedSide)(border);
+    };
+  }
+
+  static StylePart<InputBorder> borderRadius(BorderRadiusGeometry radius) {
+    return (border) {
+      if (border is UnderlineInputBorder) {
+        return PartialUnderlineInputBorder.fromBorder(
+          border,
+          hasBorderRadius: true,
+        ).copyPartial(borderRadius: radius.resolve(null));
+      }
+      if (border is OutlineInputBorder) {
+        return PartialOutlineInputBorder.fromBorder(
+          border,
+          hasBorderRadius: true,
+        ).copyPartial(borderRadius: radius.resolve(null));
+      }
+      return border;
+    };
+  }
+
+  static StylePart<InputBorder> gapPadding(double gapPadding) {
+    return (border) {
+      if (border is OutlineInputBorder) {
+        return PartialOutlineInputBorder.fromBorder(
+          border,
+          hasGapPadding: true,
+        ).copyPartial(gapPadding: gapPadding);
+      }
+      return border;
+    };
   }
 }
 

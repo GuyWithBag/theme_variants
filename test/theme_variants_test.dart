@@ -1390,6 +1390,32 @@ void main() {
       expect(inputDecoration.contentPadding, const EdgeInsets.all(12));
       expect(inputDecoration.fillColor, Colors.blue);
 
+      final borderDecoration = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => {
+          InputDecorationPart.border(
+            const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red, width: 3),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+          ),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            InputDecorationPart.borderParts({
+              InputBorderPart.borderSideParts({
+                BorderSidePart.color(tokens.primary),
+              }),
+            }),
+          },
+        },
+      ).resolve(tokens, const [ButtonTone.primary]);
+
+      final resolvedBorder = borderDecoration.border as OutlineInputBorder;
+
+      expect(resolvedBorder.borderSide.color, Colors.blue);
+      expect(resolvedBorder.borderSide.width, 3);
+      expect(resolvedBorder.borderRadius, BorderRadius.circular(12));
+
       final textField = VariantStyle.textFieldParts<TestTokens>(
         base: (_) => {
           TextFieldStylePart.text({TextStylePart.fontSize(14)}),
@@ -1407,6 +1433,9 @@ void main() {
                   borderSide: BorderSide(color: tokens.primary),
                 ),
               ),
+              InputDecorationPart.focusedBorderParts({
+                InputBorderPart.borderSideParts({BorderSidePart.width(2)}),
+              }),
             }),
             TextFieldStylePart.content({
               ContentStylePart.textAlign(TextAlign.center),
@@ -1429,6 +1458,12 @@ void main() {
           'border color',
           Colors.blue,
         ),
+      );
+      expect(
+        (textField.decorationTheme.focusedBorder as UnderlineInputBorder)
+            .borderSide
+            .width,
+        2,
       );
       expect(textField.textAlign, TextAlign.center);
       expect(textField.cursorColor, Colors.blue);

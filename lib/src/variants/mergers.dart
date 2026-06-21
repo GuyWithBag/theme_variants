@@ -26,7 +26,87 @@ InputDecorationThemeData mergeInputDecorationThemeData(
   InputDecorationThemeData base,
   InputDecorationThemeData next,
 ) {
-  return next.merge(base);
+  final merged = next.merge(base);
+  return merged.copyWith(
+    border: switch ((base.border, merged.border)) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    enabledBorder: switch ((base.enabledBorder, merged.enabledBorder)) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    focusedBorder: switch ((base.focusedBorder, merged.focusedBorder)) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    disabledBorder: switch ((base.disabledBorder, merged.disabledBorder)) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    errorBorder: switch ((base.errorBorder, merged.errorBorder)) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    focusedErrorBorder: switch ((
+      base.focusedErrorBorder,
+      merged.focusedErrorBorder,
+    )) {
+      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    outlineBorder: switch ((base.outlineBorder, merged.outlineBorder)) {
+      (final baseBorder?, final mergedBorder?) => mergeBorderSide(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+    activeIndicatorBorder: switch ((
+      base.activeIndicatorBorder,
+      merged.activeIndicatorBorder,
+    )) {
+      (final baseBorder?, final mergedBorder?) => mergeBorderSide(
+        baseBorder,
+        mergedBorder,
+      ),
+      (_, final mergedBorder?) => mergedBorder,
+      (final baseBorder?, _) => baseBorder,
+      _ => null,
+    },
+  );
 }
 
 /// Convenience merger for [ListTileThemeData].

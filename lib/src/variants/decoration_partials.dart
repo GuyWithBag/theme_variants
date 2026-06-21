@@ -204,6 +204,109 @@ class PartialBorderSide extends BorderSide {
   }
 }
 
+class PartialUnderlineInputBorder extends UnderlineInputBorder {
+  const PartialUnderlineInputBorder({
+    super.borderSide,
+    super.borderRadius,
+    this.hasBorderSide = false,
+    this.hasBorderRadius = false,
+  });
+
+  final bool hasBorderSide;
+  final bool hasBorderRadius;
+
+  factory PartialUnderlineInputBorder.fromBorder(
+    UnderlineInputBorder border, {
+    bool hasBorderSide = false,
+    bool hasBorderRadius = false,
+  }) {
+    if (border case final PartialUnderlineInputBorder partial) {
+      return partial.copyPartial(
+        hasBorderSide: hasBorderSide,
+        hasBorderRadius: hasBorderRadius,
+      );
+    }
+
+    return PartialUnderlineInputBorder(
+      borderSide: border.borderSide,
+      borderRadius: border.borderRadius,
+      hasBorderSide: hasBorderSide,
+      hasBorderRadius: hasBorderRadius,
+    );
+  }
+
+  PartialUnderlineInputBorder copyPartial({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+    bool hasBorderSide = false,
+    bool hasBorderRadius = false,
+  }) {
+    return PartialUnderlineInputBorder(
+      borderSide: borderSide ?? this.borderSide,
+      borderRadius: borderRadius ?? this.borderRadius,
+      hasBorderSide: this.hasBorderSide || hasBorderSide,
+      hasBorderRadius: this.hasBorderRadius || hasBorderRadius,
+    );
+  }
+}
+
+class PartialOutlineInputBorder extends OutlineInputBorder {
+  const PartialOutlineInputBorder({
+    super.borderSide,
+    super.borderRadius,
+    super.gapPadding,
+    this.hasBorderSide = false,
+    this.hasBorderRadius = false,
+    this.hasGapPadding = false,
+  });
+
+  final bool hasBorderSide;
+  final bool hasBorderRadius;
+  final bool hasGapPadding;
+
+  factory PartialOutlineInputBorder.fromBorder(
+    OutlineInputBorder border, {
+    bool hasBorderSide = false,
+    bool hasBorderRadius = false,
+    bool hasGapPadding = false,
+  }) {
+    if (border case final PartialOutlineInputBorder partial) {
+      return partial.copyPartial(
+        hasBorderSide: hasBorderSide,
+        hasBorderRadius: hasBorderRadius,
+        hasGapPadding: hasGapPadding,
+      );
+    }
+
+    return PartialOutlineInputBorder(
+      borderSide: border.borderSide,
+      borderRadius: border.borderRadius,
+      gapPadding: border.gapPadding,
+      hasBorderSide: hasBorderSide,
+      hasBorderRadius: hasBorderRadius,
+      hasGapPadding: hasGapPadding,
+    );
+  }
+
+  PartialOutlineInputBorder copyPartial({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+    double? gapPadding,
+    bool hasBorderSide = false,
+    bool hasBorderRadius = false,
+    bool hasGapPadding = false,
+  }) {
+    return PartialOutlineInputBorder(
+      borderSide: borderSide ?? this.borderSide,
+      borderRadius: borderRadius ?? this.borderRadius,
+      gapPadding: gapPadding ?? this.gapPadding,
+      hasBorderSide: this.hasBorderSide || hasBorderSide,
+      hasBorderRadius: this.hasBorderRadius || hasBorderRadius,
+      hasGapPadding: this.hasGapPadding || hasGapPadding,
+    );
+  }
+}
+
 class PartialBorder extends Border {
   const PartialBorder({super.top, super.right, super.bottom, super.left});
 
@@ -215,6 +318,84 @@ class PartialBorder extends Border {
       left: PartialBorderSide.fromSide(border.left),
     );
   }
+}
+
+InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
+  if (next case final PartialUnderlineInputBorder partial) {
+    if (base is OutlineInputBorder) {
+      return base.copyWith(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
+      );
+    }
+
+    if (base is UnderlineInputBorder) {
+      return base.copyWith(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
+      );
+    }
+
+    return UnderlineInputBorder(
+      borderSide: partial.hasBorderSide
+          ? mergeBorderSide(base.borderSide, partial.borderSide)
+          : partial.borderSide,
+      borderRadius: partial.hasBorderRadius
+          ? partial.borderRadius
+          : const BorderRadius.only(
+              topLeft: Radius.circular(4.0),
+              topRight: Radius.circular(4.0),
+            ),
+    );
+  }
+
+  if (next case final PartialOutlineInputBorder partial) {
+    if (base is OutlineInputBorder) {
+      return base.copyWith(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
+        gapPadding: partial.hasGapPadding
+            ? partial.gapPadding
+            : base.gapPadding,
+      );
+    }
+
+    if (base is UnderlineInputBorder) {
+      return OutlineInputBorder(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
+        gapPadding: partial.hasGapPadding ? partial.gapPadding : 4.0,
+      );
+    }
+
+    return OutlineInputBorder(
+      borderSide: partial.hasBorderSide
+          ? mergeBorderSide(base.borderSide, partial.borderSide)
+          : partial.borderSide,
+      borderRadius: partial.hasBorderRadius
+          ? partial.borderRadius
+          : const BorderRadius.all(Radius.circular(4.0)),
+      gapPadding: partial.hasGapPadding ? partial.gapPadding : 4.0,
+    );
+  }
+
+  return next;
 }
 
 BoxShadow mergeBoxShadow(BoxShadow base, BoxShadow next) {
