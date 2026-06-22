@@ -1292,6 +1292,111 @@ void main() {
       expect(resolved.maxLines, 1);
     });
 
+    test(
+      'content style merge preserves base values and applies next values',
+      () {
+        const base = ContentStyle(
+          textStyle: TextStyle(fontSize: 14),
+          iconTheme: IconThemeData(size: 18),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+        );
+        const next = ContentStyle(
+          textStyle: TextStyle(color: Colors.blue),
+          iconTheme: IconThemeData(color: Colors.blue),
+          overflow: TextOverflow.ellipsis,
+        );
+
+        final resolved = base.merge(next);
+
+        expect(resolved.textStyle.fontSize, 14);
+        expect(resolved.textStyle.color, Colors.blue);
+        expect(resolved.iconTheme.size, 18);
+        expect(resolved.iconTheme.color, Colors.blue);
+        expect(resolved.textAlign, TextAlign.center);
+        expect(resolved.overflow, TextOverflow.ellipsis);
+        expect(resolved.maxLines, 1);
+      },
+    );
+
+    test(
+      'surface style merge preserves base values and applies next values',
+      () {
+        const base = SurfaceStyle(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          contentStyle: ContentStyle(textStyle: TextStyle(fontSize: 14)),
+          padding: EdgeInsets.all(8),
+          width: 80,
+        );
+        const next = SurfaceStyle(
+          decoration: BoxDecoration(color: Colors.blue),
+          foregroundDecoration: BoxDecoration(
+            border: Border.fromBorderSide(BorderSide(color: Colors.blue)),
+          ),
+          contentStyle: ContentStyle(textStyle: TextStyle(color: Colors.white)),
+          margin: EdgeInsets.all(4),
+          height: 44,
+        );
+
+        final resolved = base.merge(next);
+
+        expect(resolved.decoration.color, Colors.blue);
+        expect(
+          resolved.decoration.borderRadius,
+          const BorderRadius.all(Radius.circular(12)),
+        );
+        expect(
+          resolved.foregroundDecoration?.borderRadius,
+          const BorderRadius.all(Radius.circular(12)),
+        );
+        expect(
+          resolved.foregroundDecoration?.border,
+          const Border.fromBorderSide(BorderSide(color: Colors.blue)),
+        );
+        expect(resolved.textStyle.fontSize, 14);
+        expect(resolved.textStyle.color, Colors.white);
+        expect(resolved.padding, const EdgeInsets.all(8));
+        expect(resolved.margin, const EdgeInsets.all(4));
+        expect(resolved.width, 80);
+        expect(resolved.height, 44);
+      },
+    );
+
+    test(
+      'text field style merge preserves base values and applies next values',
+      () {
+        const base = TextFieldStyle(
+          textStyle: TextStyle(fontSize: 14),
+          decorationTheme: InputDecorationThemeData(
+            contentPadding: EdgeInsets.all(12),
+          ),
+          textAlign: TextAlign.start,
+        );
+        const next = TextFieldStyle(
+          textStyle: TextStyle(color: Colors.blue),
+          decorationTheme: InputDecorationThemeData(fillColor: Colors.blue),
+          cursorColor: Colors.blue,
+        );
+
+        final resolved = base.merge(next);
+
+        expect(resolved.textStyle.fontSize, 14);
+        expect(resolved.textStyle.color, Colors.blue);
+        expect(
+          resolved.decorationTheme.contentPadding,
+          const EdgeInsets.all(12),
+        );
+        expect(resolved.decorationTheme.fillColor, Colors.blue);
+        expect(resolved.textAlign, TextAlign.start);
+        expect(resolved.cursorColor, Colors.blue);
+      },
+    );
+
     test('button parts resolve ButtonStyle fragments', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.buttonParts<TestTokens>(

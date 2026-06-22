@@ -1,3 +1,10 @@
+## 0.2.8
+
+* Added `merge` extension methods for `ContentStyle`, `SurfaceStyle`, and
+  `TextFieldStyle`.
+* Updated the custom style merger functions to delegate to the new merge
+  methods.
+
 ## 0.2.7
 
 * Added partial input decoration helpers for updating borders without replacing
