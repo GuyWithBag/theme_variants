@@ -1,3 +1,14 @@
+## 0.4.0
+
+* Breaking: replaced the split input border part helpers with
+  `InputBorderPart`.
+* Added `InputBorderPart.outline()`, `InputBorderPart.underline()`, and
+  `InputBorderPart.none()` for selecting the input border family.
+* Moved shared border side and radius helpers to `InputBorderPart`, including
+  `color`, `width`, `borderSideParts`, and `borderRadius`.
+* Kept `InputBorderPart.gapPadding` as an outline-producing helper because
+  gap padding is only supported by `OutlineInputBorder`.
+
 ## 0.3.1
 
 * Added `InputBorderSidePart` for composing input border color, width, style,

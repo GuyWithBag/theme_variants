@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 
 class PartialInputBorderSide extends InputBorder {
-  const PartialInputBorderSide({super.borderSide, this.hasBorderSide = false});
+  const PartialInputBorderSide({
+    super.borderSide,
+    this.borderRadius,
+    this.hasBorderSide = false,
+    this.hasBorderRadius = false,
+  });
 
+  final BorderRadius? borderRadius;
   final bool hasBorderSide;
+  final bool hasBorderRadius;
 
   PartialInputBorderSide copyPartial({
     BorderSide? borderSide,
+    BorderRadius? borderRadius,
     bool hasBorderSide = false,
+    bool hasBorderRadius = false,
   }) {
     return PartialInputBorderSide(
       borderSide: borderSide ?? this.borderSide,
+      borderRadius: borderRadius ?? this.borderRadius,
       hasBorderSide: this.hasBorderSide || hasBorderSide,
+      hasBorderRadius: this.hasBorderRadius || hasBorderRadius,
     );
   }
 

@@ -43,7 +43,11 @@ InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
         borderSide: partial.hasBorderSide
             ? mergeBorderSide(base.borderSide, partial.borderSide)
             : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
         hasBorderSide: base.hasBorderSide || partial.hasBorderSide,
+        hasBorderRadius: base.hasBorderRadius || partial.hasBorderRadius,
       );
     }
 
@@ -52,6 +56,9 @@ InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
         borderSide: partial.hasBorderSide
             ? mergeBorderSide(base.borderSide, partial.borderSide)
             : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
       );
     }
 
@@ -60,6 +67,9 @@ InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
         borderSide: partial.hasBorderSide
             ? mergeBorderSide(base.borderSide, partial.borderSide)
             : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : base.borderRadius,
       );
     }
 
