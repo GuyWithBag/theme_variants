@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-/// The brightness slot a [ThemeVariant] occupies inside a theme preset.
-enum ThemeVariantBrightness { single, light, dark }
+import 'package:theme_variants/theme_variants.dart';
 
 /// A concrete theme payload within a theme preset.
 class ThemeVariant<TTokens> {
@@ -63,7 +61,7 @@ class ThemeVariant<TTokens> {
 
     return ThemeVariant<TTokens>(
       themePresetId: rawPresetId,
-      brightness: parseThemeVariantBrightness(rawBrightness),
+      brightness: _parseThemeVariantBrightness(rawBrightness),
       themeData: decodeThemeData(map['theme_data']),
       tokens: decodeTokens(map['tokens']),
     );
@@ -71,7 +69,7 @@ class ThemeVariant<TTokens> {
 }
 
 /// Parses a persisted brightness token into [ThemeVariantBrightness].
-ThemeVariantBrightness parseThemeVariantBrightness(String value) {
+ThemeVariantBrightness _parseThemeVariantBrightness(String value) {
   return switch (value) {
     'single' => ThemeVariantBrightness.single,
     'light' => ThemeVariantBrightness.light,

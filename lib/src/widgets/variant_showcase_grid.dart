@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../models/content_style.dart';
-import '../models/surface_style.dart';
-import '../models/text_field_style.dart';
-import '../variants/variant_style.dart';
-import 'surface.dart';
-import 'theme_variants_context.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// Builds a preview for one resolved variant combination.
 typedef VariantShowcaseBuilder<TValue> =

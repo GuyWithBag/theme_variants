@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'variant_style_factories.dart';
-
-export 'style_parts.dart';
 import 'package:theme_variants/theme_variants.dart';
-
-export 'types.dart';
 
 /// A typed, CVA-like style resolver.
 class VariantStyle<TTokens, TValue> {

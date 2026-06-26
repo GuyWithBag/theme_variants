@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../theme/theme_variant.dart';
-import '../theme/theme_preset.dart';
-import '../theme/theme_variant_registry.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// Transforms a resolved theme before it is returned by the controller.
 typedef ThemeVariantTransformer<TTokens> =

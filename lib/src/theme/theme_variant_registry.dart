@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'theme_variant.dart';
-import 'theme_preset.dart';
-
-/// Determines how imported presets are applied to an existing registry.
-enum ThemeImportMode { addOnly, replaceAndAdd, replaceOnly }
+import 'package:theme_variants/theme_variants.dart';
 
 /// Stores all named themes an app can choose from.
 class ThemeVariantRegistry<TTokens> {

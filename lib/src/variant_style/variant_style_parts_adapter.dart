@@ -1,5 +1,4 @@
-import 'compound_variant.dart';
-import 'variant_style.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 VariantStyle<TTokens, TValue> partsVariantStyle<TTokens, TValue>({
   required TValue seed,

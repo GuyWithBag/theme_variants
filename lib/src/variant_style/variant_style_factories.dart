@@ -1,6 +1,4 @@
-import 'compound_variant.dart';
-import 'variant_style.dart';
-import 'variant_style_parts_adapter.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 VariantStyle<TTokens, TValue> createVariantStyle<TTokens, TValue>({
   required ThemeVariantBuilder<TTokens, TValue> base,

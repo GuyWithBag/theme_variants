@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'theme_variant.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// Describes whether a theme preset has one theme or separate light/dark themes.
 enum ThemePresetType { single, lightDark }

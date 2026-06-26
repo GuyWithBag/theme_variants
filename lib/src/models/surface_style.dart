@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'content_style.dart';
+import 'package:theme_variants/theme_variants.dart';
 
 /// A paired surface decoration and content style.
 ///
