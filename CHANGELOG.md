@@ -1,3 +1,14 @@
+## 0.3.0
+
+* Breaking: replaced `InputBorderPart` with concrete `OutlineInputBorderPart`
+  and `UnderlineInputBorderPart` helpers.
+* Added `NoInputBorderPart.none()` for explicitly resolving a border slot to
+  `InputBorder.none`.
+* Removed `TextFieldStylePart` border shortcut helpers in favor of using
+  `InputDecorationPart.borderParts(...)` directly.
+* Added conflict detection so a border slot cannot resolve as more than one
+  input border family.
+
 ## 0.2.9
 
 * Fixed `TextFieldStylePart` state border part helpers so partial

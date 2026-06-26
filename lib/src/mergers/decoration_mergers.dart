@@ -24,9 +24,13 @@ BoxShape _mergeBoxShape(BoxShape base, BoxShape next) {
 }
 
 InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
+  if (next is PartialNoInputBorder) {
+    return InputBorder.none;
+  }
+
   if (next case final PartialUnderlineInputBorder partial) {
     if (base is OutlineInputBorder) {
-      return base.copyWith(
+      return UnderlineInputBorder(
         borderSide: partial.hasBorderSide
             ? mergeBorderSide(base.borderSide, partial.borderSide)
             : base.borderSide,

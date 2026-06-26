@@ -1413,9 +1413,11 @@ void main() {
         },
         variants: {
           ButtonTone.primary: (tokens) => {
-            TextFieldStylePart.border({
-              InputBorderPart.borderSideParts({
-                BorderSidePart.color(tokens.primary),
+            TextFieldStylePart.decoration({
+              InputDecorationPart.borderParts({
+                OutlineInputBorderPart.borderSideParts({
+                  BorderSidePart.color(tokens.primary),
+                }),
               }),
             }),
           },
@@ -1436,27 +1438,27 @@ void main() {
       final cases = [
         (
           name: 'enabledBorder',
-          part: TextFieldStylePart.enabledBorder,
+          part: InputDecorationPart.enabledBorderParts,
           select: (InputDecorationThemeData theme) => theme.enabledBorder,
         ),
         (
           name: 'focusedBorder',
-          part: TextFieldStylePart.focusedBorder,
+          part: InputDecorationPart.focusedBorderParts,
           select: (InputDecorationThemeData theme) => theme.focusedBorder,
         ),
         (
           name: 'disabledBorder',
-          part: TextFieldStylePart.disabledBorder,
+          part: InputDecorationPart.disabledBorderParts,
           select: (InputDecorationThemeData theme) => theme.disabledBorder,
         ),
         (
           name: 'errorBorder',
-          part: TextFieldStylePart.errorBorder,
+          part: InputDecorationPart.errorBorderParts,
           select: (InputDecorationThemeData theme) => theme.errorBorder,
         ),
         (
           name: 'focusedErrorBorder',
-          part: TextFieldStylePart.focusedErrorBorder,
+          part: InputDecorationPart.focusedErrorBorderParts,
           select: (InputDecorationThemeData theme) => theme.focusedErrorBorder,
         ),
       ];
@@ -1476,9 +1478,11 @@ void main() {
           },
           variants: {
             ButtonTone.primary: (tokens) => {
-              testCase.part({
-                InputBorderPart.borderSideParts({
-                  BorderSidePart.color(tokens.primary),
+              TextFieldStylePart.decoration({
+                testCase.part({
+                  OutlineInputBorderPart.borderSideParts({
+                    BorderSidePart.color(tokens.primary),
+                  }),
                 }),
               }),
             },
@@ -1497,6 +1501,119 @@ void main() {
           reason: testCase.name,
         );
         expect(border.gapPadding, 8, reason: testCase.name);
+      }
+    });
+
+    test('concrete input border parts choose the border family', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => const <StylePart<InputDecorationThemeData>>{},
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            InputDecorationPart.borderParts({
+              OutlineInputBorderPart.borderRadius(
+                BorderRadius.circular(tokens.radius),
+              ),
+              OutlineInputBorderPart.borderSideParts({
+                BorderSidePart.color(tokens.primary),
+                BorderSidePart.width(2),
+              }),
+              OutlineInputBorderPart.gapPadding(8),
+            }),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+      final border = resolved.border as OutlineInputBorder;
+
+      expect(border.borderRadius, BorderRadius.circular(12));
+      expect(border.borderSide.color, Colors.blue);
+      expect(border.borderSide.width, 2);
+      expect(border.gapPadding, 8);
+    });
+
+    test('no input border part chooses InputBorder.none', () {
+      final style = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => const <StylePart<InputDecorationThemeData>>{},
+        variants: {
+          ButtonTone.primary: (_) => {
+            InputDecorationPart.borderParts({NoInputBorderPart.none()}),
+          },
+        },
+      );
+
+      final resolved = style.resolve(
+        const TestTokens(radius: 12, primary: Colors.blue),
+        const [ButtonTone.primary],
+      );
+
+      expect(resolved.border, InputBorder.none);
+    });
+
+    test('mixed concrete input border families throw', () {
+      final style = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => const <StylePart<InputDecorationThemeData>>{},
+        variants: {
+          ButtonTone.primary: (_) => {
+            InputDecorationPart.borderParts({
+              OutlineInputBorderPart.borderSideParts({BorderSidePart.width(2)}),
+              UnderlineInputBorderPart.borderSideParts({
+                BorderSidePart.width(3),
+              }),
+            }),
+          },
+        },
+      );
+
+      expect(
+        () => style.resolve(
+          const TestTokens(radius: 12, primary: Colors.blue),
+          const [ButtonTone.primary],
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('cannot resolve as both OutlineInputBorder'),
+          ),
+        ),
+      );
+    });
+
+    test('no input border part conflicts with concrete border families', () {
+      final cases = [
+        {
+          NoInputBorderPart.none(),
+          OutlineInputBorderPart.borderSideParts({BorderSidePart.width(2)}),
+        },
+        {
+          UnderlineInputBorderPart.borderSideParts({BorderSidePart.width(2)}),
+          NoInputBorderPart.none(),
+        },
+      ];
+
+      for (final parts in cases) {
+        final style = VariantStyle.inputDecorationParts<TestTokens>(
+          base: (_) => const <StylePart<InputDecorationThemeData>>{},
+          variants: {
+            ButtonTone.primary: (_) => {InputDecorationPart.borderParts(parts)},
+          },
+        );
+
+        expect(
+          () => style.resolve(
+            const TestTokens(radius: 12, primary: Colors.blue),
+            const [ButtonTone.primary],
+          ),
+          throwsA(
+            isA<StateError>().having(
+              (error) => error.message,
+              'message',
+              contains('InputBorder.none'),
+            ),
+          ),
+        );
       }
     });
 
@@ -1610,7 +1727,7 @@ void main() {
         variants: {
           ButtonTone.primary: (tokens) => {
             InputDecorationPart.borderParts({
-              InputBorderPart.borderSideParts({
+              OutlineInputBorderPart.borderSideParts({
                 BorderSidePart.color(tokens.primary),
               }),
             }),
@@ -1642,7 +1759,9 @@ void main() {
                 ),
               ),
               InputDecorationPart.focusedBorderParts({
-                InputBorderPart.borderSideParts({BorderSidePart.width(2)}),
+                UnderlineInputBorderPart.borderSideParts({
+                  BorderSidePart.width(2),
+                }),
               }),
             }),
             TextFieldStylePart.content({

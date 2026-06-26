@@ -26,7 +26,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      border: applyStyleParts<InputBorder>(
+      border: _resolveInputBorderParts(
         theme.border ?? const UnderlineInputBorder(),
         parts,
       ),
@@ -41,7 +41,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      enabledBorder: applyStyleParts<InputBorder>(
+      enabledBorder: _resolveInputBorderParts(
         theme.enabledBorder ?? theme.border ?? const UnderlineInputBorder(),
         parts,
       ),
@@ -56,7 +56,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      focusedBorder: applyStyleParts<InputBorder>(
+      focusedBorder: _resolveInputBorderParts(
         theme.focusedBorder ?? theme.border ?? const UnderlineInputBorder(),
         parts,
       ),
@@ -73,7 +73,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      disabledBorder: applyStyleParts<InputBorder>(
+      disabledBorder: _resolveInputBorderParts(
         theme.disabledBorder ?? theme.border ?? const UnderlineInputBorder(),
         parts,
       ),
@@ -88,7 +88,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      errorBorder: applyStyleParts<InputBorder>(
+      errorBorder: _resolveInputBorderParts(
         theme.errorBorder ?? theme.border ?? const UnderlineInputBorder(),
         parts,
       ),
@@ -105,7 +105,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      focusedErrorBorder: applyStyleParts<InputBorder>(
+      focusedErrorBorder: _resolveInputBorderParts(
         theme.focusedErrorBorder ??
             theme.focusedBorder ??
             theme.border ??
@@ -146,4 +146,16 @@ class InputDecorationPart {
       ),
     );
   }
+}
+
+InputBorder _resolveInputBorderParts(
+  InputBorder base,
+  Iterable<StylePart<InputBorder>> parts,
+) {
+  final resolved = applyStyleParts<InputBorder>(base, parts);
+  if (resolved is PartialNoInputBorder) {
+    return InputBorder.none;
+  }
+
+  return resolved;
 }

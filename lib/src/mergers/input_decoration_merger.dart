@@ -76,6 +76,7 @@ InputBorder? _mergeInputBorderThemeSlot({
 }
 
 bool _isPartialInputBorder(InputBorder border) {
-  return border is PartialUnderlineInputBorder ||
+  return border is PartialNoInputBorder ||
+      border is PartialUnderlineInputBorder ||
       border is PartialOutlineInputBorder;
 }
