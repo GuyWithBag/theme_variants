@@ -1397,6 +1397,109 @@ void main() {
       },
     );
 
+    test('text field border parts preserve existing border fields', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.textFieldParts<TestTokens>(
+        base: (_) => {
+          TextFieldStylePart.decoration({
+            InputDecorationPart.border(
+              const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red, width: 3),
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                gapPadding: 8,
+              ),
+            ),
+          }),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            TextFieldStylePart.border({
+              InputBorderPart.borderSideParts({
+                BorderSidePart.color(tokens.primary),
+              }),
+            }),
+          },
+        },
+      );
+
+      final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+      final border = resolved.decorationTheme.border as OutlineInputBorder;
+
+      expect(border.borderSide.color, Colors.blue);
+      expect(border.borderSide.width, 3);
+      expect(border.borderRadius, BorderRadius.circular(12));
+      expect(border.gapPadding, 8);
+    });
+
+    test('text field state border parts fall back to the base border', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final cases = [
+        (
+          name: 'enabledBorder',
+          part: TextFieldStylePart.enabledBorder,
+          select: (InputDecorationThemeData theme) => theme.enabledBorder,
+        ),
+        (
+          name: 'focusedBorder',
+          part: TextFieldStylePart.focusedBorder,
+          select: (InputDecorationThemeData theme) => theme.focusedBorder,
+        ),
+        (
+          name: 'disabledBorder',
+          part: TextFieldStylePart.disabledBorder,
+          select: (InputDecorationThemeData theme) => theme.disabledBorder,
+        ),
+        (
+          name: 'errorBorder',
+          part: TextFieldStylePart.errorBorder,
+          select: (InputDecorationThemeData theme) => theme.errorBorder,
+        ),
+        (
+          name: 'focusedErrorBorder',
+          part: TextFieldStylePart.focusedErrorBorder,
+          select: (InputDecorationThemeData theme) => theme.focusedErrorBorder,
+        ),
+      ];
+
+      for (final testCase in cases) {
+        final style = VariantStyle.textFieldParts<TestTokens>(
+          base: (_) => {
+            TextFieldStylePart.decoration({
+              InputDecorationPart.border(
+                const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red, width: 3),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  gapPadding: 8,
+                ),
+              ),
+            }),
+          },
+          variants: {
+            ButtonTone.primary: (tokens) => {
+              testCase.part({
+                InputBorderPart.borderSideParts({
+                  BorderSidePart.color(tokens.primary),
+                }),
+              }),
+            },
+          },
+        );
+
+        final resolved = style.resolve(tokens, const [ButtonTone.primary]);
+        final border =
+            testCase.select(resolved.decorationTheme) as OutlineInputBorder;
+
+        expect(border.borderSide.color, Colors.blue, reason: testCase.name);
+        expect(border.borderSide.width, 3, reason: testCase.name);
+        expect(
+          border.borderRadius,
+          BorderRadius.circular(12),
+          reason: testCase.name,
+        );
+        expect(border.gapPadding, 8, reason: testCase.name);
+      }
+    });
+
     test('button parts resolve ButtonStyle fragments', () {
       const tokens = TestTokens(radius: 12, primary: Colors.blue);
       final style = VariantStyle.buttonParts<TestTokens>(

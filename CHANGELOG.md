@@ -1,3 +1,10 @@
+## 0.2.9
+
+* Fixed `TextFieldStylePart` state border part helpers so partial
+  `enabledBorder`, `focusedBorder`, `disabledBorder`, `errorBorder`, and
+  `focusedErrorBorder` updates inherit the base input border when the matching
+  state border is not set.
+
 ## 0.2.8
 
 * Added `merge` extension methods for `ContentStyle`, `SurfaceStyle`, and

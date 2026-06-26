@@ -28,63 +28,32 @@ InputDecorationThemeData mergeInputDecorationThemeData(
 ) {
   final merged = next.merge(base);
   return merged.copyWith(
-    border: switch ((base.border, merged.border)) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
-    enabledBorder: switch ((base.enabledBorder, merged.enabledBorder)) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
-    focusedBorder: switch ((base.focusedBorder, merged.focusedBorder)) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
-    disabledBorder: switch ((base.disabledBorder, merged.disabledBorder)) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
-    errorBorder: switch ((base.errorBorder, merged.errorBorder)) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
-    focusedErrorBorder: switch ((
-      base.focusedErrorBorder,
-      merged.focusedErrorBorder,
-    )) {
-      (final baseBorder?, final mergedBorder?) => mergeInputBorder(
-        baseBorder,
-        mergedBorder,
-      ),
-      (_, final mergedBorder?) => mergedBorder,
-      (final baseBorder?, _) => baseBorder,
-      _ => null,
-    },
+    border: _mergeInputBorderThemeSlot(base: base.border, next: merged.border),
+    enabledBorder: _mergeInputBorderThemeSlot(
+      base: base.enabledBorder,
+      fallback: base.border,
+      next: merged.enabledBorder,
+    ),
+    focusedBorder: _mergeInputBorderThemeSlot(
+      base: base.focusedBorder,
+      fallback: base.border,
+      next: merged.focusedBorder,
+    ),
+    disabledBorder: _mergeInputBorderThemeSlot(
+      base: base.disabledBorder,
+      fallback: base.border,
+      next: merged.disabledBorder,
+    ),
+    errorBorder: _mergeInputBorderThemeSlot(
+      base: base.errorBorder,
+      fallback: base.border,
+      next: merged.errorBorder,
+    ),
+    focusedErrorBorder: _mergeInputBorderThemeSlot(
+      base: base.focusedErrorBorder,
+      fallback: base.focusedBorder ?? base.border,
+      next: merged.focusedErrorBorder,
+    ),
     outlineBorder: switch ((base.outlineBorder, merged.outlineBorder)) {
       (final baseBorder?, final mergedBorder?) => mergeBorderSide(
         baseBorder,
@@ -107,6 +76,28 @@ InputDecorationThemeData mergeInputDecorationThemeData(
       _ => null,
     },
   );
+}
+
+InputBorder? _mergeInputBorderThemeSlot({
+  required InputBorder? base,
+  required InputBorder? next,
+  InputBorder? fallback,
+}) {
+  if (next == null) {
+    return base;
+  }
+
+  final effectiveBase = base ?? (_isPartialInputBorder(next) ? fallback : null);
+  if (effectiveBase == null) {
+    return next;
+  }
+
+  return mergeInputBorder(effectiveBase, next);
+}
+
+bool _isPartialInputBorder(InputBorder border) {
+  return border is PartialUnderlineInputBorder ||
+      border is PartialOutlineInputBorder;
 }
 
 /// Convenience merger for [ListTileThemeData].
