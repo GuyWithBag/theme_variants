@@ -46,6 +46,13 @@ PartialOutlineInputBorder _outlineBorderFrom(InputBorder border) {
     return PartialOutlineInputBorder.fromBorder(border);
   }
 
+  if (border is PartialInputBorderSide) {
+    return PartialOutlineInputBorder(
+      borderSide: border.borderSide,
+      hasBorderSide: border.hasBorderSide,
+    );
+  }
+
   if (border is UnderlineInputBorder) {
     return PartialOutlineInputBorder(
       borderSide: border.borderSide,

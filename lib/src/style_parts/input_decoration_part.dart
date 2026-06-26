@@ -26,10 +26,7 @@ class InputDecorationPart {
     Iterable<StylePart<InputBorder>> parts,
   ) {
     return (theme) => theme.copyWith(
-      border: _resolveInputBorderParts(
-        theme.border ?? const UnderlineInputBorder(),
-        parts,
-      ),
+      border: _resolveInputBorderParts(theme.border, null, parts),
     );
   }
 
@@ -42,7 +39,8 @@ class InputDecorationPart {
   ) {
     return (theme) => theme.copyWith(
       enabledBorder: _resolveInputBorderParts(
-        theme.enabledBorder ?? theme.border ?? const UnderlineInputBorder(),
+        theme.enabledBorder,
+        theme.border,
         parts,
       ),
     );
@@ -57,7 +55,8 @@ class InputDecorationPart {
   ) {
     return (theme) => theme.copyWith(
       focusedBorder: _resolveInputBorderParts(
-        theme.focusedBorder ?? theme.border ?? const UnderlineInputBorder(),
+        theme.focusedBorder,
+        theme.border,
         parts,
       ),
     );
@@ -74,7 +73,8 @@ class InputDecorationPart {
   ) {
     return (theme) => theme.copyWith(
       disabledBorder: _resolveInputBorderParts(
-        theme.disabledBorder ?? theme.border ?? const UnderlineInputBorder(),
+        theme.disabledBorder,
+        theme.border,
         parts,
       ),
     );
@@ -89,7 +89,8 @@ class InputDecorationPart {
   ) {
     return (theme) => theme.copyWith(
       errorBorder: _resolveInputBorderParts(
-        theme.errorBorder ?? theme.border ?? const UnderlineInputBorder(),
+        theme.errorBorder,
+        theme.border,
         parts,
       ),
     );
@@ -106,10 +107,8 @@ class InputDecorationPart {
   ) {
     return (theme) => theme.copyWith(
       focusedErrorBorder: _resolveInputBorderParts(
-        theme.focusedErrorBorder ??
-            theme.focusedBorder ??
-            theme.border ??
-            const UnderlineInputBorder(),
+        theme.focusedErrorBorder,
+        theme.focusedBorder ?? theme.border,
         parts,
       ),
     );
@@ -149,12 +148,22 @@ class InputDecorationPart {
 }
 
 InputBorder _resolveInputBorderParts(
-  InputBorder base,
+  InputBorder? base,
+  InputBorder? fallback,
   Iterable<StylePart<InputBorder>> parts,
 ) {
-  final resolved = applyStyleParts<InputBorder>(base, parts);
+  final effectiveBase = base ?? fallback;
+  final seed =
+      effectiveBase ?? const PartialInputBorderSide(borderSide: BorderSide());
+  final resolved = applyStyleParts<InputBorder>(seed, parts);
   if (resolved is PartialNoInputBorder) {
     return InputBorder.none;
+  }
+
+  if (resolved is PartialInputBorderSide) {
+    return effectiveBase == null
+        ? resolved
+        : mergeInputBorder(effectiveBase, resolved);
   }
 
   return resolved;

@@ -6,6 +6,8 @@ enum ButtonSize { sm, md, lg }
 
 enum ButtonTone { primary, danger }
 
+enum FieldFrame { outline, underline, none }
+
 enum CardTone { neutral, highlighted }
 
 enum ButtonDensity { compact }
@@ -1533,6 +1535,64 @@ void main() {
       expect(border.gapPadding, 8);
     });
 
+    test('input border side parts compose with frame variants', () {
+      const tokens = TestTokens(radius: 12, primary: Colors.blue);
+      final style = VariantStyle.inputDecorationParts<TestTokens>(
+        base: (_) => {
+          InputDecorationPart.borderParts({
+            InputBorderSidePart.color(Colors.red),
+            InputBorderSidePart.width(1),
+          }),
+        },
+        variants: {
+          ButtonTone.primary: (tokens) => {
+            InputDecorationPart.borderParts({
+              InputBorderSidePart.color(tokens.primary),
+            }),
+          },
+          ButtonSize.lg: (_) => {
+            InputDecorationPart.borderParts({InputBorderSidePart.width(4)}),
+          },
+          FieldFrame.outline: (tokens) => {
+            InputDecorationPart.borderParts({
+              OutlineInputBorderPart.borderRadius(
+                BorderRadius.circular(tokens.radius),
+              ),
+            }),
+          },
+          FieldFrame.underline: (tokens) => {
+            InputDecorationPart.borderParts({
+              UnderlineInputBorderPart.borderRadius(
+                BorderRadius.circular(tokens.radius),
+              ),
+            }),
+          },
+        },
+      );
+
+      final outline = style.resolve(tokens, const [
+        ButtonTone.primary,
+        ButtonSize.lg,
+        FieldFrame.outline,
+      ]);
+      final outlineBorder = outline.border as OutlineInputBorder;
+
+      expect(outlineBorder.borderSide.color, Colors.blue);
+      expect(outlineBorder.borderSide.width, 4);
+      expect(outlineBorder.borderRadius, BorderRadius.circular(12));
+
+      final underline = style.resolve(tokens, const [
+        FieldFrame.underline,
+        ButtonSize.lg,
+        ButtonTone.primary,
+      ]);
+      final underlineBorder = underline.border as UnderlineInputBorder;
+
+      expect(underlineBorder.borderSide.color, Colors.blue);
+      expect(underlineBorder.borderSide.width, 4);
+      expect(underlineBorder.borderRadius, BorderRadius.circular(12));
+    });
+
     test('no input border part chooses InputBorder.none', () {
       final style = VariantStyle.inputDecorationParts<TestTokens>(
         base: (_) => const <StylePart<InputDecorationThemeData>>{},
@@ -1549,6 +1609,30 @@ void main() {
       );
 
       expect(resolved.border, InputBorder.none);
+    });
+
+    test('no input border part conflicts with side parts', () {
+      final cases = [
+        {NoInputBorderPart.none(), InputBorderSidePart.width(2)},
+        {InputBorderSidePart.width(2), NoInputBorderPart.none()},
+      ];
+
+      for (final parts in cases) {
+        final style = VariantStyle.inputDecorationParts<TestTokens>(
+          base: (_) => const <StylePart<InputDecorationThemeData>>{},
+          variants: {
+            ButtonTone.primary: (_) => {InputDecorationPart.borderParts(parts)},
+          },
+        );
+
+        expect(
+          () => style.resolve(
+            const TestTokens(radius: 12, primary: Colors.blue),
+            const [ButtonTone.primary],
+          ),
+          throwsA(isA<StateError>()),
+        );
+      }
     });
 
     test('mixed concrete input border families throw', () {

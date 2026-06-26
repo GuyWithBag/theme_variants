@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:theme_variants/src/messages/conflicting_input_border_parts_message.dart';
 import 'package:theme_variants/theme_variants.dart';
 
 /// Convenience merger for [BoxDecoration].
@@ -25,10 +26,65 @@ BoxShape _mergeBoxShape(BoxShape base, BoxShape next) {
 
 InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
   if (next is PartialNoInputBorder) {
+    if (base is PartialInputBorderSide) {
+      throw StateError(conflictingInputBorderPartsMessage);
+    }
+
     return InputBorder.none;
   }
 
+  if (next case final PartialInputBorderSide partial) {
+    if (base == InputBorder.none) {
+      throw StateError(conflictingInputBorderPartsMessage);
+    }
+
+    if (base is PartialInputBorderSide) {
+      return PartialInputBorderSide(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        hasBorderSide: base.hasBorderSide || partial.hasBorderSide,
+      );
+    }
+
+    if (base is OutlineInputBorder) {
+      return base.copyWith(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+      );
+    }
+
+    if (base is UnderlineInputBorder) {
+      return base.copyWith(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+      );
+    }
+
+    return base.copyWith(
+      borderSide: partial.hasBorderSide
+          ? mergeBorderSide(base.borderSide, partial.borderSide)
+          : base.borderSide,
+    );
+  }
+
   if (next case final PartialUnderlineInputBorder partial) {
+    if (base is PartialInputBorderSide) {
+      return UnderlineInputBorder(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : const BorderRadius.only(
+                topLeft: Radius.circular(4.0),
+                topRight: Radius.circular(4.0),
+              ),
+      );
+    }
+
     if (base is OutlineInputBorder) {
       return UnderlineInputBorder(
         borderSide: partial.hasBorderSide
@@ -65,6 +121,18 @@ InputBorder mergeInputBorder(InputBorder base, InputBorder next) {
   }
 
   if (next case final PartialOutlineInputBorder partial) {
+    if (base is PartialInputBorderSide) {
+      return OutlineInputBorder(
+        borderSide: partial.hasBorderSide
+            ? mergeBorderSide(base.borderSide, partial.borderSide)
+            : base.borderSide,
+        borderRadius: partial.hasBorderRadius
+            ? partial.borderRadius
+            : const BorderRadius.all(Radius.circular(4.0)),
+        gapPadding: partial.hasGapPadding ? partial.gapPadding : 4.0,
+      );
+    }
+
     if (base is OutlineInputBorder) {
       return base.copyWith(
         borderSide: partial.hasBorderSide

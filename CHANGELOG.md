@@ -1,3 +1,12 @@
+## 0.3.1
+
+* Added `InputBorderSidePart` for composing input border color, width, style,
+  and stroke alignment independently from the selected input border family.
+* Updated input border merging so side-only parts can combine with
+  `OutlineInputBorderPart` or `UnderlineInputBorderPart` variants.
+* Kept `NoInputBorderPart.none()` incompatible with side parts and concrete
+  border family parts.
+
 ## 0.3.0
 
 * Breaking: replaced `InputBorderPart` with concrete `OutlineInputBorderPart`

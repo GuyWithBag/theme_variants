@@ -8,7 +8,8 @@ class NoInputBorderPart {
   static StylePart<InputBorder> none() {
     return (border) {
       if (border is PartialOutlineInputBorder ||
-          border is PartialUnderlineInputBorder) {
+          border is PartialUnderlineInputBorder ||
+          (border is PartialInputBorderSide && border.hasBorderSide)) {
         throw StateError(conflictingInputBorderPartsMessage);
       }
 

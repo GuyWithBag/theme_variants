@@ -9,6 +9,7 @@ export 'core_parts.dart';
 export 'decoration_part.dart';
 export 'icon_theme_part.dart';
 export 'input_decoration_part.dart';
+export 'input_border_side_part.dart';
 export 'list_tile_part.dart';
 export 'navigation_bar_part.dart';
 export 'shadow_part.dart';
